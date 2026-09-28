@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="inema-course" content="agscv2">
+  <title>A pergunta do 10× | Agente sob Controle</title>
+
+  <!-- ANTI-FOUC: bloqueante, ANTES do Tailwind -->
+  <script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; }
+        } else {
+          var legacy = localStorage.getItem('theme');
+          if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark';
+        }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = {
+        'inema-dark': { dark: true,  attr: null,        cs: 'dark'  },
+        'claro':      { dark: false, attr: null,        cs: 'light' },
+        'sepia':      { dark: false, attr: 'sepia',     cs: 'light' },
+        'foco':       { dark: null,  attr: 'foco',      cs: null    },
+        'contraste':  { dark: true,  attr: 'contraste', cs: 'dark'  }
+      };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+      html.setAttribute('data-font', p.font || 'inter');
+      html.setAttribute('data-accent', p.accent || 'emerald');
+      var s = html.style; var scale = (+p.fontScale || 100);
+      s.setProperty('--inema-font-scale', (scale / 100).toString());
+      s.setProperty('font-size', scale + '%');
+      s.setProperty('--measure', (+p.lineWidth || 68) + 'ch');
+      s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+      var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+        : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC = { emerald: [152,76,45], blue: [217,91,60], purple: [258,90,66], amber: [38,92,50], teal: [174,72,41], rose: [350,89,60] };
+      var a = ACC[p.accent] || ACC.emerald;
+      s.setProperty('--accent-h', a[0]+''); s.setProperty('--accent-s', a[1]+'%'); s.setProperty('--accent-l', a[2]+'%');
+      s.setProperty('--accent', 'hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch(e){} }
+  })();
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: {
+      primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/learn.css">
+
+  <!-- Manifesto do curso (OBRIGATORIO em TODA pagina, identico) -->
+  <script type="application/json" data-inema-manifest>
+  {"course":"agscv2","tracks":[{"n":"1","title":"Por que agora","modules":[{"id":"1-1","title":"Responder não é agir","topics":6,"href":"curso/trilha1/modulo-1-1.html"},{"id":"1-2","title":"Mais capaz, mais limites","topics":6,"href":"curso/trilha1/modulo-1-2.html"}]},{"n":"2","title":"Achar a dor","modules":[{"id":"2-1","title":"A pergunta do 10×","topics":6,"href":"curso/trilha2/modulo-2-1.html"},{"id":"2-2","title":"Pedido não é problema","topics":6,"href":"curso/trilha2/modulo-2-2.html"}]},{"n":"3","title":"Controlar o sistema","modules":[{"id":"3-1","title":"As cinco chaves","topics":6,"href":"curso/trilha3/modulo-3-1.html"},{"id":"3-2","title":"Três regras e casos reais","topics":6,"href":"curso/trilha3/modulo-3-2.html"}]},{"n":"4","title":"O que quase ninguém conta","modules":[{"id":"4-1","title":"Ordens escondidas","topics":6,"href":"curso/trilha4/modulo-4-1.html"},{"id":"4-2","title":"Senhas e extensões","topics":6,"href":"curso/trilha4/modulo-4-2.html"},{"id":"4-3","title":"Gasto, isolamento e LGPD","topics":6,"href":"curso/trilha4/modulo-4-3.html"}]},{"n":"5","title":"Assumir o resultado","modules":[{"id":"5-1","title":"Métrica com dono","topics":6,"href":"curso/trilha5/modulo-5-1.html"},{"id":"5-2","title":"A planilha em 4 blocos","topics":6,"href":"curso/trilha5/modulo-5-2.html"}]}]}
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-200 { color: #1f2937; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #6b7280; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+
+    /* Light mode - acentos das 5 trilhas (emerald, blue, purple, amber, teal) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(217, 119, 6, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(217, 119, 6, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(217, 119, 6, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(217, 119, 6, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+    html:not(.dark) .text-teal-400 { color: #0d9488; }
+    html:not(.dark) .bg-teal-500\/20 { background-color: rgba(13, 148, 136, 0.12); }
+    html:not(.dark) .bg-teal-500\/10 { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .bg-teal-900\/20 { background-color: rgba(13, 148, 136, 0.07); }
+    html:not(.dark) .border-teal-500\/30 { border-color: rgba(13, 148, 136, 0.25); }
+    html:not(.dark) .hover\:bg-teal-500\/30:hover { background-color: rgba(13, 148, 136, 0.18); }
+    html:not(.dark) .hover\:text-teal-400:hover { color: #0d9488; }
+    html:not(.dark) .hover\:bg-teal-500\/10:hover { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-teal-400 { color: #0d9488; }
+
+    /* Light mode - remove gradientes e cores especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/40 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.22); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.06); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+
+    /* Light mode - nav */
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* Alvos de ancora abaixo do nav sticky */
+    [data-inema-topic], [id^="modulo-"], [id^="topico-"] { scroll-margin-top: 72px; }
+
+    /* SVG light mode + animacao */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-dash { to { stroke-dashoffset: -24; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+      .wf-flow { stroke-dasharray: 6 6; animation: wf-dash 1.2s linear infinite; }
+    }
+
+    /* Topicos expansiveis */
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+  </style>
+</head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-black focus:rounded-lg">Pular para o conteúdo</a>
+
+  <nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-14">
+        <div class="flex items-center space-x-3">
+          <a href="../../index.html" class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300">
+            <span class="text-2xl">🛡️</span>
+            <span class="font-bold text-lg hidden lg:inline">Agente sob Controle</span>
+          </a>
+          <span class="text-neutral-600">|</span>
+          <a href="https://inema.club" target="_blank" class="text-sky-400 hover:text-sky-300 text-sm font-medium">INEMA.CLUB</a>
+          <span class="text-neutral-600">-</span>
+          <a href="https://inema.pro" target="_blank" class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200 text-sm font-medium">PRO</a>
+        </div>
+        <div class="flex items-center space-x-1">
+          <a href="../trilha1/index.html" class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+            <span class="xl:hidden">T1</span><span class="hidden xl:inline">Por que agora</span>
+          </a>
+          <a href="index.html" class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10">
+            <span class="xl:hidden">T2</span><span class="hidden xl:inline">Achar a dor</span>
+          </a>
+          <a href="../trilha3/index.html" class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors">
+            <span class="xl:hidden">T3</span><span class="hidden xl:inline">Controle</span>
+          </a>
+          <a href="../trilha4/index.html" class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors">
+            <span class="xl:hidden">T4</span><span class="hidden xl:inline">Riscos ocultos</span>
+          </a>
+          <a href="../trilha5/index.html" class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-teal-400 hover:bg-teal-500/10 transition-colors">
+            <span class="xl:hidden">T5</span><span class="hidden xl:inline">Resultado</span>
+          </a>
+          <button type="button" data-inema-journey-open class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-neutral-300 hover:text-neutral-100 transition-colors" title="Minha jornada">
+            <span aria-hidden="true">◷</span><span class="hidden md:inline">Jornada</span>
+            <span class="inema-journey-badge" data-inema-journey-badge data-count="0"></span>
+          </button>
+          <div class="relative">
+            <button type="button" data-inema-appearance-toggle="#aparencia" aria-expanded="false" aria-controls="aparencia" class="p-2 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors" title="Aparência">
+              <span aria-hidden="true" class="text-sm font-semibold">Aa</span><span class="sr-only">Aparência</span>
+            </button>
+            <div id="aparencia" data-inema-appearance class="inema-appearance-pop">
+              <div class="inema-segment" aria-label="Tema">
+                <button type="button" data-inema-set-theme="inema-dark">Escuro</button>
+                <button type="button" data-inema-set-theme="claro">Claro</button>
+                <button type="button" data-inema-set-theme="sepia">Sépia</button>
+                <button type="button" data-inema-set-theme="foco">Foco</button>
+                <button type="button" data-inema-set-theme="contraste">Alto contraste</button>
+              </div>
+              <div class="inema-segment" aria-label="Fonte">
+                <button type="button" data-inema-set-font="inter">Inter</button>
+                <button type="button" data-inema-set-font="system">Sistema</button>
+                <button type="button" data-inema-set-font="leitura">Leitura</button>
+              </div>
+              <div class="inema-segment" aria-label="Tamanho do texto">
+                <button type="button" data-inema-set-fontscale="100">A</button>
+                <button type="button" data-inema-set-fontscale="112">A+</button>
+                <button type="button" data-inema-set-fontscale="125">A++</button>
+              </div>
+              <div class="inema-segment" aria-label="Largura da linha">
+                <button type="button" data-inema-set-linewidth="60">Estreito</button>
+                <button type="button" data-inema-set-linewidth="68">Médio</button>
+                <button type="button" data-inema-set-linewidth="75">Largo</button>
+              </div>
+              <div class="inema-segment" aria-label="Entrelinha">
+                <button type="button" data-inema-set-leading="1.45">Compacto</button>
+                <button type="button" data-inema-set-leading="1.7">Confortável</button>
+              </div>
+            </div>
+          </div>
+          <button id="theme-toggle" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" aria-label="Alternar tema claro/escuro">
+            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4" aria-label="Trilha de navegação">
+    <div class="flex items-center space-x-2 text-sm text-neutral-400">
+      <a href="../../index.html" class="hover:text-blue-400">Início</a><span>/</span>
+      <a href="index.html" class="hover:text-blue-400">Trilha 2</a><span>/</span>
+      <span class="text-blue-400">Módulo 2.1</span>
+    </div>
+  </nav>
+
+  <header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="2-1" data-inema-track="2">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4">MÓDULO 2.1</span>
+      <h1 class="text-3xl sm:text-4xl font-bold mb-4">💥 A pergunta do 10×</h1>
+      <p class="text-lg text-neutral-400 max-w-3xl">Antes de escolher a ferramenta, escolha o problema. Uma pergunta simples mostra o que quebra primeiro no seu negócio — e é ali que um agente rende mais.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 max-w-2xl">
+        <div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">6</div><div class="text-xs text-neutral-400">Tópicos</div></div>
+        <div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">~30</div><div class="text-xs text-neutral-400">Minutos</div></div>
+        <div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Prático</div><div class="text-xs text-neutral-400">Nível</div></div>
+        <div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Diagnóstico</div><div class="text-xs text-neutral-400">Tipo</div></div>
+      </div>
+      <div data-inema-meter="modulo:2-1" class="mt-6 max-w-2xl" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso do módulo 2.1">
+        <div class="flex justify-between text-xs text-neutral-400 mb-1"><span data-inema-meter-frac>0 de 6</span><span data-inema-meter-pct>0%</span></div>
+        <div class="inema-bar"><div class="inema-bar__fill" data-inema-meter-fill></div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[1fr_220px] lg:gap-10">
+  <main id="conteudo" class="min-w-0" data-inema-module="2-1" data-inema-track="2">
+
+    <!-- ===================== TOPICO 1 ===================== -->
+    <section id="topico-1" data-inema-topic="modulo-2-1#topico-1" class="mb-16">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">1</span>
+        <h2 class="text-2xl font-bold flex-1">Faça a pergunta do 10×</h2>
+        <button type="button" data-inema-doubt-toggle aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm"><span aria-hidden="true">?</span><span>Tenho dúvida</span></button>
+      </div>
+      <p data-inema-block="m2-1-t1-p1" class="text-neutral-300 mb-4 leading-relaxed">Um agente executa rápido. Se o plano estiver errado, ele executa o erro rápido também. Por isso a primeira decisão não é "qual ferramenta", e sim <strong class="text-blue-400">qual problema</strong>.</p>
+      <p data-inema-block="m2-1-t1-p2" class="text-neutral-300 mb-4 leading-relaxed">Uma pergunta ajuda a achar o ponto fraco sem planilha nem consultor: <strong class="text-blue-400">"se o meu negócio crescesse 10 vezes amanhã, que processo quebraria primeiro?"</strong></p>
+      <p data-inema-block="m2-1-t1-p3" class="text-neutral-300 mb-6 leading-relaxed">Ninguém precisa crescer 10 vezes de verdade. A pergunta só exagera o movimento para o ponto fraco aparecer. O que quebraria com 10× já está rangendo hoje, só que baixinho.</p>
+
+      <div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+        <h3 class="text-base font-semibold text-blue-400 mb-3 flex items-center"><span class="mr-2">🆕</span> Novo aqui? Duas palavras desta trilha</h3>
+        <ul class="space-y-2 text-neutral-300 text-sm">
+          <li><strong>Processo</strong> — uma tarefa que se repete sempre do mesmo jeito: marcar horário, cobrar, conferir documento, responder orçamento.</li>
+          <li><strong>Gargalo</strong> — o ponto mais estreito do processo, onde o trabalho se acumula. Como o gargalo de uma garrafa: não importa o tamanho dela, a água sai no ritmo do bico.</li>
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+        <svg viewBox="0 0 800 270" class="w-full h-auto" role="img" aria-label="Teste do 10×. Da esquerda entra uma carga de dez vezes mais clientes. Ela passa por quatro processos em fila: responder mensagem, marcar e confirmar horário, atender e cobrar. O segundo processo, marcar e confirmar horário, está destacado com um alerta vermelho: é o que quebra primeiro. Os processos depois dele recebem menos do que chegou.">
+          <defs>
+            <filter id="m21-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <pattern id="m21-grid" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r="1.3" fill="#60a5fa" opacity="0.10"/></pattern>
+            <marker id="m21-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker>
+            <marker id="m21-arrow-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"/></marker>
+          </defs>
+          <rect x="0" y="0" width="800" height="270" fill="url(#m21-grid)"/>
+          <text x="400" y="30" text-anchor="middle" fill="#60a5fa" font-family="Inter,sans-serif" font-weight="600" font-size="14">E se amanhã chegassem 10× mais clientes?</text>
+          <rect x="20" y="108" width="84" height="60" rx="12" fill="#0b1f2e" stroke="#38bdf8" stroke-width="2"/>
+          <text x="62" y="136" text-anchor="middle" fill="#38bdf8" font-family="Inter,sans-serif" font-weight="700" font-size="20">×10</text>
+          <text x="62" y="156" text-anchor="middle" fill="#bae6fd" font-family="Inter,sans-serif" font-size="11">clientes</text>
+          <line class="wf-flow" x1="106" y1="138" x2="140" y2="138" stroke="#38bdf8" stroke-width="3" marker-end="url(#m21-arrow-c)"/>
+          <g font-family="Inter,sans-serif" text-anchor="middle">
+            <rect x="144" y="110" width="140" height="56" rx="12" fill="#1f2937" stroke="#4b5563" stroke-width="2"/>
+            <text x="214" y="134" fill="#d1d5db" font-size="13">responder</text><text x="214" y="152" fill="#9ca3af" font-size="11">mensagens</text>
+            <line class="wf-flow" x1="286" y1="138" x2="316" y2="138" stroke="#38bdf8" stroke-width="3" marker-end="url(#m21-arrow-c)"/>
+            <g filter="url(#m21-glow)"><rect x="320" y="104" width="150" height="68" rx="14" fill="#0f1b33" stroke="#60a5fa" stroke-width="2.5"/></g>
+            <text x="395" y="134" fill="#60a5fa" font-weight="600" font-size="13">marcar e confirmar</text><text x="395" y="152" fill="#bfdbfe" font-size="11">horário</text>
+            <line x1="472" y1="138" x2="502" y2="138" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3 5" marker-end="url(#m21-arrow)"/>
+            <rect x="506" y="110" width="120" height="56" rx="12" fill="#1f2937" stroke="#4b5563" stroke-width="2"/>
+            <text x="566" y="142" fill="#d1d5db" font-size="13">atender</text>
+            <line x1="628" y1="138" x2="658" y2="138" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3 5" marker-end="url(#m21-arrow)"/>
+            <rect x="662" y="110" width="118" height="56" rx="12" fill="#1f2937" stroke="#4b5563" stroke-width="2"/>
+            <text x="721" y="142" fill="#d1d5db" font-size="13">cobrar</text>
+          </g>
+          <circle cx="395" cy="76" r="15" fill="#3b0d0d" stroke="#f87171" stroke-width="2"/>
+          <text x="395" y="82" text-anchor="middle" fill="#fca5a5" font-family="Inter,sans-serif" font-weight="700" font-size="16">!</text>
+          <text x="420" y="81" fill="#fca5a5" font-family="Inter,sans-serif" font-size="12">quebra primeiro</text>
+          <text x="395" y="200" text-anchor="middle" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="12">horários esquecidos, faltas, confusão na agenda</text>
+          <text x="640" y="200" text-anchor="middle" fill="#9ca3af" font-family="Inter,sans-serif" font-size="11">recebem menos do que chegou</text>
+          <text x="400" y="248" text-anchor="middle" fill="#9ca3af" font-family="Inter,sans-serif" font-size="12">o gargalo decide o ritmo do negócio inteiro — é ali que o agente rende mais</text>
+        </svg>
+      </div>
+      <p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Como ler o desenho:</strong> as setas azuis grossas são o volume que chega; as cinzas tracejadas são o que consegue passar. Todo o movimento extra trava na caixa acesa. Melhorar "atender" ou "cobrar" não adianta nada enquanto a caixa acesa estiver entupida.</p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💥</div><div class="text-sm font-semibold text-blue-400">Pergunta do 10×</div><p class="text-xs text-neutral-400 mt-1">exagera para revelar</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🍾</div><div class="text-sm font-semibold text-blue-400">Gargalo</div><p class="text-xs text-neutral-400 mt-1">o ponto mais estreito</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔁</div><div class="text-sm font-semibold text-blue-400">Processo</div><p class="text-xs text-neutral-400 mt-1">tarefa que se repete</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🎯</div><div class="text-sm font-semibold text-blue-400">Problema antes</div><p class="text-xs text-neutral-400 mt-1">ferramenta depois</p></div>
+      </div>
+      <div class="flex justify-start mt-6">
+        <button type="button" data-inema-read-toggle aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors">
+          <span class="inema-read-icon" aria-hidden="true">○</span><span class="inema-read-label">Marcar como lido</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== TOPICO 2 ===================== -->
+    <section id="topico-2" data-inema-topic="modulo-2-1#topico-2" class="mb-16">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">2</span>
+        <h2 class="text-2xl font-bold flex-1">Separe o que quebra do que só incomoda</h2>
+        <button type="button" data-inema-doubt-toggle aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm"><span aria-hidden="true">?</span><span>Tenho dúvida</span></button>
+      </div>
+      <p data-inema-block="m2-1-t2-p1" class="text-neutral-300 mb-4 leading-relaxed">Quando você faz a pergunta do 10×, aparece uma lista de reclamações. Nem tudo nela é gargalo. Parte é só <strong>incômodo</strong>: chato, repetitivo, mas não trava nada.</p>
+      <p data-inema-block="m2-1-t2-p2" class="text-neutral-300 mb-6 leading-relaxed">O teste é perguntar o que acontece se ninguém fizer aquilo por uma semana. Se o negócio perde cliente, dinheiro ou prazo, <strong class="text-blue-400">quebra</strong>. Se só fica mais feio ou mais lento, incomoda.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+          <h4 class="font-bold text-blue-400 mb-4">💥 Quebra</h4>
+          <ul class="space-y-3 text-neutral-300 text-sm">
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Paciente marca e ninguém confirma: horário vazio, sala paga.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Documento do cliente chega atrasado: guia vence, multa aparece.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Orçamento sem resposta em 24h: cliente fecha com outro.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Cobrança esquecida: dinheiro que não entra.</span></li>
+          </ul>
+        </div>
+        <div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+          <h4 class="font-bold text-red-400 mb-4">😒 Só incomoda</h4>
+          <ul class="space-y-3 text-neutral-300 text-sm">
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Renomear arquivos na pasta do computador.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Escrever a legenda do post da semana.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Organizar a caixa de e-mail por cores.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Montar o relatório bonito que ninguém lê.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-dark-700/60 text-blue-400"><tr><th class="px-4 py-3 font-semibold">Pergunta</th><th class="px-4 py-3 font-semibold">Se a resposta for "sim"…</th></tr></thead>
+          <tbody class="divide-y divide-dark-600">
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Uma semana sem fazer, eu perco cliente?</td><td class="px-4 py-3 text-neutral-300">quebra</td></tr>
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Uma semana sem fazer, eu perco dinheiro ou pago multa?</td><td class="px-4 py-3 text-neutral-300">quebra</td></tr>
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Com 10× mais movimento, ela vira fila?</td><td class="px-4 py-3 text-neutral-300">quebra (em breve)</td></tr>
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Só dá preguiça, mas nada acontece se atrasar?</td><td class="px-4 py-3 text-neutral-300">incomoda — fica para depois</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">O que olhar na tabela:</strong> as três primeiras perguntas falam de cliente, dinheiro e fila. A última fala de sentimento. Sentimento conta, mas não paga a conta do agente.</p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📅</div><div class="text-sm font-semibold text-blue-400">Teste da semana</div><p class="text-xs text-neutral-400 mt-1">e se ninguém fizesse?</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💥</div><div class="text-sm font-semibold text-blue-400">Quebra</div><p class="text-xs text-neutral-400 mt-1">perde cliente ou dinheiro</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">😒</div><div class="text-sm font-semibold text-blue-400">Incomoda</div><p class="text-xs text-neutral-400 mt-1">chato, mas não trava</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏳</div><div class="text-sm font-semibold text-blue-400">Fila</div><p class="text-xs text-neutral-400 mt-1">sinal de gargalo</p></div>
+      </div>
+      <div class="flex justify-start mt-6">
+        <button type="button" data-inema-read-toggle aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors">
+          <span class="inema-read-icon" aria-hidden="true">○</span><span class="inema-read-label">Marcar como lido</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== TOPICO 3 ===================== -->
+    <section id="topico-3" data-inema-topic="modulo-2-1#topico-3" class="mb-16">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">3</span>
+        <h2 class="text-2xl font-bold flex-1">Ache o gargalo com números</h2>
+        <button type="button" data-inema-doubt-toggle aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm"><span aria-hidden="true">?</span><span>Tenho dúvida</span></button>
+      </div>
+      <p data-inema-block="m2-1-t3-p1" class="text-neutral-300 mb-4 leading-relaxed">Achou dois ou três candidatos? Agora saia do palpite. Para cada um, conte três coisas numa semana comum: <strong class="text-blue-400">tempo</strong> gasto, <strong class="text-blue-400">dinheiro</strong> perdido e <strong class="text-blue-400">erros</strong> que aconteceram.</p>
+      <p data-inema-block="m2-1-t3-p2" class="text-neutral-300 mb-6 leading-relaxed">Não precisa de sistema. Um papel ao lado do computador, um traço cada vez que acontece. No fim da semana, some.</p>
+
+      <div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+        <svg viewBox="0 0 800 280" class="w-full h-auto" role="img" aria-label="Gráfico de barras com as horas por semana que o escritório do Marcos gasta em quatro processos. Conferir documentos que chegam pelo WhatsApp: 10 horas, a barra maior e destacada. Responder dúvidas de clientes: 4 horas. Emitir guias: 3 horas. Postar nas redes: 1 hora.">
+          <defs>
+            <pattern id="m21b-grid" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r="1.3" fill="#60a5fa" opacity="0.10"/></pattern>
+            <filter id="m21b-glow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <rect x="0" y="0" width="800" height="280" fill="url(#m21b-grid)"/>
+          <text x="30" y="32" fill="#60a5fa" font-family="Inter,sans-serif" font-weight="600" font-size="14">Escritório do Marcos · horas por semana</text>
+          <line x1="260" y1="50" x2="260" y2="240" stroke="#4b5563" stroke-width="1.5"/>
+          <g font-family="Inter,sans-serif" font-size="13">
+            <text x="248" y="80" text-anchor="end" fill="#e5e7eb">conferir documentos</text>
+            <g filter="url(#m21b-glow)"><rect x="262" y="62" width="450" height="28" rx="6" fill="#0f1b33" stroke="#60a5fa" stroke-width="2"/></g>
+            <text x="722" y="81" fill="#60a5fa" font-weight="700">10 h</text>
+            <text x="248" y="126" text-anchor="end" fill="#d1d5db">responder dúvidas</text>
+            <rect x="262" y="108" width="180" height="28" rx="6" fill="#0b1f2e" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="452" y="127" fill="#bae6fd">4 h</text>
+            <text x="248" y="172" text-anchor="end" fill="#d1d5db">emitir guias</text>
+            <rect x="262" y="154" width="135" height="28" rx="6" fill="#0b1f2e" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="407" y="173" fill="#bae6fd">3 h</text>
+            <text x="248" y="218" text-anchor="end" fill="#9ca3af">postar nas redes</text>
+            <rect x="262" y="200" width="45" height="28" rx="6" fill="#1f2937" stroke="#4b5563" stroke-width="1.5"/>
+            <text x="317" y="219" fill="#9ca3af">1 h</text>
+          </g>
+          <text x="262" y="264" fill="#9ca3af" font-family="Inter,sans-serif" font-size="11">+ 3 guias pagas com atraso no mês por documento que chegou tarde (erro que vira multa)</text>
+        </svg>
+      </div>
+      <p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Como ler o desenho:</strong> o comprimento de cada barra é tempo gasto. A barra acesa é mais do que as outras três somadas — e ainda gera multa (linha de baixo). O Marcos achava que o problema era "postar mais"; os números mostram que é a menor barra.</p>
+
+      <div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-dark-700/60 text-blue-400"><tr><th class="px-4 py-3 font-semibold">Conte na semana</th><th class="px-4 py-3 font-semibold">Como anotar</th><th class="px-4 py-3 font-semibold">Exemplo</th></tr></thead>
+          <tbody class="divide-y divide-dark-600">
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">⏱ Tempo</td><td class="px-4 py-3 text-neutral-300">minutos por vez × vezes</td><td class="px-4 py-3 text-neutral-300">20 min × 30 documentos = 10 h</td></tr>
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">💰 Dinheiro</td><td class="px-4 py-3 text-neutral-300">o que deixou de entrar ou saiu a mais</td><td class="px-4 py-3 text-neutral-300">multa de guia atrasada</td></tr>
+            <tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">⚠️ Erro</td><td class="px-4 py-3 text-neutral-300">um traço cada vez que deu errado</td><td class="px-4 py-3 text-neutral-300">3 documentos faltando no mês</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Se travou aqui, é normal</h3>
+        <p class="text-neutral-300 text-sm">Não tem o número exato? Estime pela memória da última semana e escreva "estimativa" ao lado. Um número aproximado já é melhor que nenhum. Na trilha 5 você mede de verdade, antes e depois do agente.</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏱</div><div class="text-sm font-semibold text-blue-400">Tempo</div><p class="text-xs text-neutral-400 mt-1">horas por semana</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💰</div><div class="text-sm font-semibold text-blue-400">Dinheiro</div><p class="text-xs text-neutral-400 mt-1">o que se perde</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⚠️</div><div class="text-sm font-semibold text-blue-400">Erro</div><p class="text-xs text-neutral-400 mt-1">quantas vezes deu errado</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">✏️</div><div class="text-sm font-semibold text-blue-400">Estimativa</div><p class="text-xs text-neutral-400 mt-1">vale, se marcada</p></div>
+      </div>
+      <div class="flex justify-start mt-6">
+        <button type="button" data-inema-read-toggle aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors">
+          <span class="inema-read-icon" aria-hidden="true">○</span><span class="inema-read-label">Marcar como lido</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== TOPICO 4 ===================== -->
+    <section id="topico-4" data-inema-topic="modulo-2-1#topico-4" class="mb-16">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">4</span>
+        <h2 class="text-2xl font-bold flex-1">Evite automatizar o que não dói</h2>
+        <button type="button" data-inema-doubt-toggle aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm"><span aria-hidden="true">?</span><span>Tenho dúvida</span></button>
+      </div>
+      <p data-inema-block="m2-1-t4-p1" class="text-neutral-300 mb-4 leading-relaxed">O erro mais comum não é técnico. É escolher o processo errado. A gente tende a automatizar o que é <strong>divertido</strong> de automatizar ou o que <strong>aparece</strong> — post, vídeo, "robô que responde" — e deixa de lado o que custa, porque é chato e ninguém vê.</p>
+      <p data-inema-block="m2-1-t4-p2" class="text-neutral-300 mb-6 leading-relaxed">E cada agente ligado é uma porta a mais para controlar (trilhas 3 e 4). Não vale abrir porta para ganhar pouco.</p>
+
+      <div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+        <svg viewBox="0 0 800 300" class="w-full h-auto" role="img" aria-label="Matriz dois por dois. Eixo vertical: quanto custa quando dá errado. Eixo horizontal: quanto aparece ou quanto é divertido de automatizar. Quadrante de cima à esquerda, destacado: custa muito e ninguém vê, como confirmar horário e conferir documentos, automatize primeiro. Cima à direita: custa e aparece, cuidado dobrado. Baixo à direita: aparece mas custa pouco, a armadilha, como post automático. Baixo à esquerda: nem custa nem aparece, deixe como está.">
+          <defs>
+            <pattern id="m21m-grid" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1.3" cy="1.3" r="1.3" fill="#60a5fa" opacity="0.10"/></pattern>
+            <filter id="m21m-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <marker id="m21m-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/></marker>
+          </defs>
+          <rect x="0" y="0" width="800" height="300" fill="url(#m21m-grid)"/>
+          <line x1="150" y1="270" x2="150" y2="22" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#m21m-arrow)"/>
+          <line x1="150" y1="270" x2="770" y2="270" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#m21m-arrow)"/>
+          <text x="140" y="40" text-anchor="end" fill="#9ca3af" font-family="Inter,sans-serif" font-size="11">custa</text>
+          <text x="140" y="54" text-anchor="end" fill="#9ca3af" font-family="Inter,sans-serif" font-size="11">muito</text>
+          <text x="760" y="290" text-anchor="end" fill="#9ca3af" font-family="Inter,sans-serif" font-size="11">aparece / é divertido →</text>
+          <g font-family="Inter,sans-serif" text-anchor="middle">
+            <g filter="url(#m21m-glow)"><rect x="166" y="30" width="290" height="110" rx="14" fill="#0f1b33" stroke="#60a5fa" stroke-width="2.5"/></g>
+            <text x="311" y="62" fill="#60a5fa" font-weight="700" font-size="14">custa e ninguém vê</text>
+            <text x="311" y="84" fill="#bfdbfe" font-size="12">confirmar horário, conferir documento,</text>
+            <text x="311" y="100" fill="#bfdbfe" font-size="12">cobrar atrasado</text>
+            <text x="311" y="124" fill="#60a5fa" font-weight="600" font-size="12">→ comece por aqui</text>
+            <rect x="470" y="30" width="290" height="110" rx="14" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+            <text x="615" y="66" fill="#bae6fd" font-weight="600" font-size="14">custa e aparece</text>
+            <text x="615" y="90" fill="#9ca3af" font-size="12">responder cliente em nome da loja</text>
+            <text x="615" y="116" fill="#38bdf8" font-size="12">vale, com cuidado dobrado</text>
+            <rect x="166" y="152" width="290" height="104" rx="14" fill="#1f2937" stroke="#4b5563" stroke-width="2"/>
+            <text x="311" y="190" fill="#d1d5db" font-weight="600" font-size="14">nem custa, nem aparece</text>
+            <text x="311" y="214" fill="#9ca3af" font-size="12">renomear arquivos, pastas</text>
+            <text x="311" y="236" fill="#9ca3af" font-size="12">deixe como está</text>
+            <rect x="470" y="152" width="290" height="104" rx="14" fill="#2a0f0f" stroke="#f87171" stroke-width="2"/>
+            <text x="615" y="190" fill="#fca5a5" font-weight="600" font-size="14">aparece, mas custa pouco</text>
+            <text x="615" y="214" fill="#fca5a5" font-size="12">post automático, vídeo, "robozinho"</text>
+            <text x="615" y="236" fill="#fca5a5" font-size="12">a armadilha</text>
+          </g>
+        </svg>
+      </div>
+      <p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Como ler o desenho:</strong> quanto mais alto, mais o problema custa; quanto mais à direita, mais ele aparece. A caixa acesa (alto e à esquerda) é onde o dinheiro vaza em silêncio. A caixa vermelha é onde quase todo mundo começa — e por isso se decepciona.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+          <h4 class="font-bold text-blue-400 mb-4">✓ Bons sinais para automatizar</h4>
+          <ul class="space-y-3 text-neutral-300 text-sm">
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Acontece toda semana, do mesmo jeito.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Quando falha, dá para contar o prejuízo.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Você sabe dizer como é "feito certo".</span></li>
+          </ul>
+        </div>
+        <div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+          <h4 class="font-bold text-red-400 mb-4">✗ Maus sinais</h4>
+          <ul class="space-y-3 text-neutral-300 text-sm">
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>"Todo mundo está fazendo."</span></li>
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Acontece uma vez por mês e leva cinco minutos.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Cada caso é diferente e depende do seu julgamento.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-red-400 mb-2 flex items-center"><span class="mr-2">⚠️</span> Atenção</h3>
+        <p class="text-neutral-300 text-sm">Trazer mais clientes para um processo que já vaza não resolve: aumenta o vazamento. Se o gargalo está no meio do caminho, encher a entrada só faz a fila crescer — e o cliente perdido agora é um cliente que você pagou para atrair.</p>
+      </div>
+      <div class="flex justify-start mt-6">
+        <button type="button" data-inema-read-toggle aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors">
+          <span class="inema-read-icon" aria-hidden="true">○</span><span class="inema-read-label">Marcar como lido</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== TOPICO 5 ===================== -->
+    <section id="topico-5" data-inema-topic="modulo-2-1#topico-5" class="mb-16">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">5</span>
+        <h2 class="text-2xl font-bold flex-1">Rode a entrevista do 10× com um chat de IA</h2>
+        <button type="button" data-inema-doubt-toggle aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm"><span aria-hidden="true">?</span><span>Tenho dúvida</span></button>
+      </div>
+      <p data-inema-block="m2-1-t5-p1" class="text-neutral-300 mb-4 leading-relaxed">Sozinho, é fácil fugir da pergunta. Um chat de IA ajuda a manter o foco: ele pergunta, você responde. <strong class="text-blue-400">Uma pergunta por vez</strong> deixa a conversa curta e leva direto ao gargalo.</p>
+      <p data-inema-block="m2-1-t5-p2" class="text-neutral-300 mb-6 leading-relaxed">Aqui o chat é só um <strong>assistente</strong>: ele não liga em nada, não mexe em nada. Quem conhece o negócio e responde é você.</p>
+
+      <div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+        <div class="px-5 py-3 bg-blue-900/20 border-b border-blue-500/30"><span class="text-blue-400 font-semibold text-sm">🎯 Objetivo: sair com um processo candidato e o número que prova que ele custa</span></div>
+        <div class="p-5">
+          <p class="text-sm text-neutral-400 mb-3">Cole no chat de IA que você já usa (ChatGPT, Claude, Gemini). Troque o que está entre &lt; &gt;.</p>
+          <pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">Me entreviste sobre o meu negócio: &lt;descreva em uma linha, ex.: salão de beleza com 3 cadeiras e 1 recepcionista&gt;.
+
+Comece por esta pergunta: se o meu negócio crescesse 10 vezes amanhã, que processo quebraria primeiro?
+
+Regras da entrevista:
+- Faça UMA pergunta por vez e espere a minha resposta.
+- No máximo 6 perguntas.
+- Para cada processo que eu citar, pergunte: quantas vezes por semana acontece, quanto tempo leva e o que acontece quando dá errado.
+- Separe o que QUEBRA (perde cliente, dinheiro ou prazo) do que só INCOMODA.
+- Não invente números: use só o que eu disser. Se eu não souber, escreva "estimar".
+
+No fim, escreva:
+1. o processo que quebra primeiro, em uma frase;
+2. os números que eu dei (vezes por semana, tempo, prejuízo);
+3. o que eu deveria contar na próxima semana para confirmar;
+4. um processo que parece urgente mas só incomoda.</pre>
+        </div>
+        <div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-blue-400">Como verificar:</strong> a resposta final tem os 4 itens, cada número veio da sua boca (nada que você não disse) e o item 1 é um processo — não um desejo como "vender mais".</div>
+      </div>
+
+      <div class="bg-dark-800 rounded-xl border border-dark-600 p-6 mb-6">
+        <h3 class="text-base font-semibold text-blue-400 mb-4">Como ficou o começo da entrevista do Marcos</h3>
+        <div class="space-y-3 text-sm">
+          <div class="bg-dark-700/60 rounded-lg p-3"><strong class="text-neutral-100">Marcos:</strong> <span class="text-neutral-300">Me entreviste sobre o meu negócio: escritório de contabilidade com duas pessoas e cerca de oitenta clientes…</span></div>
+          <div class="bg-blue-900/20 rounded-lg p-3 border border-blue-500/30"><strong class="text-blue-400">Chat:</strong> <span class="text-neutral-300">Se amanhã você tivesse dez vezes mais clientes, qual tarefa do dia você não daria conta de fazer?</span></div>
+          <div class="bg-dark-700/60 rounded-lg p-3"><strong class="text-neutral-100">Marcos:</strong> <span class="text-neutral-300">Conferir os documentos que os clientes mandam pelo WhatsApp. Hoje já levo a manhã inteira nisso.</span></div>
+          <div class="bg-blue-900/20 rounded-lg p-3 border border-blue-500/30"><strong class="text-blue-400">Chat:</strong> <span class="text-neutral-300">Quantos documentos chegam por semana, e o que acontece quando um falta?</span></div>
+        </div>
+      </div>
+
+      <div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Dica prática</h3>
+        <p class="text-neutral-300 text-sm">A conversa fica só entre você e o chat. Não cole nomes de clientes nem documentos: fale do <em>processo</em>, não das pessoas. Isso já é o primeiro hábito de segurança do curso.</p>
+      </div>
+      <div class="flex justify-start mt-6">
+        <button type="button" data-inema-read-toggle aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors">
+          <span class="inema-read-icon" aria-hidden="true">○</span><span class="inema-read-label">Marcar como lido</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== TOPICO 6 ===================== -->
+    <section id="topico-6" data-inema-topic="modulo-2-1#topico-6" class="mb-16">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">6</span>
+        <h2 class="text-2xl font-bold flex-1">Escolha um processo, só um</h2>
+        <button type="button" data-inema-doubt-toggle aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm"><span aria-hidden="true">?</span><span>Tenho dúvida</span></button>
+      </div>
+      <p data-inema-block="m2-1-t6-p1" class="text-neutral-300 mb-4 leading-relaxed">A tentação é resolver tudo de uma vez. Não faça. Um agente por vez, num processo por vez, é o único jeito de saber se ele funcionou e se ficou sob controle.</p>
+      <p data-inema-block="m2-1-t6-p2" class="text-neutral-300 mb-6 leading-relaxed">Os outros candidatos não somem: vão para uma lista de espera. Quando o primeiro estiver rodando e medido, você volta a ela.</p>
+
+      <div class="space-y-5 mb-6">
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">1</span></div>
+          <div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Liste os candidatos</h4><p class="text-neutral-300 text-sm">O que saiu da entrevista do 10× que quebra — não o que incomoda.</p></div>
+        </div>
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">2</span></div>
+          <div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Ponha o número ao lado</h4><p class="text-neutral-300 text-sm">Horas por semana ou reais por mês. Sem número, o candidato fica para a próxima semana.</p></div>
+        </div>
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">3</span></div>
+          <div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Corte o que mexe em dinheiro, para começar</h4><p class="text-neutral-300 text-sm">Pagamento e cobrança automáticos ficam para quando você já tiver controle (trilha 3). O primeiro agente deve errar barato.</p></div>
+        </div>
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">4</span></div>
+          <div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Escreva a frase de decisão</h4><p class="text-neutral-300 text-sm">"Vou começar por <em>&lt;processo&gt;</em>, porque hoje ele custa <em>&lt;número&gt;</em> por <em>&lt;semana/mês&gt;</em>." O Marcos escreveu: "Vou começar pela conferência de documentos, porque hoje ela custa 10 horas por semana e três multas por mês."</p></div>
+        </div>
+      </div>
+
+      <div class="bg-dark-800 rounded-xl border border-dark-600 p-6 mb-6" data-inema-check="modulo-2-1#q1">
+        <p class="font-medium mb-4">Teste rápido (opcional): a Renata tem três candidatos. Qual ela deve escolher primeiro?</p>
+        <div class="space-y-2">
+          <button type="button" data-inema-check-option="0" class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm">Um agente que posta três vezes por dia no Instagram da clínica.</button>
+          <button type="button" data-inema-check-option="1" class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm">Confirmar as consultas marcadas, porque 9 de 38 pacientes faltaram no mês.</button>
+          <button type="button" data-inema-check-option="2" class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm">Os três ao mesmo tempo, para ganhar tempo.</button>
+        </div>
+        <div data-inema-check-feedback class="mt-4 text-sm" role="status" aria-live="polite"></div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">☝️</div><div class="text-sm font-semibold text-blue-400">Um só</div><p class="text-xs text-neutral-400 mt-1">um agente, um processo</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔢</div><div class="text-sm font-semibold text-blue-400">Com número</div><p class="text-xs text-neutral-400 mt-1">sem número, espera</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🪙</div><div class="text-sm font-semibold text-blue-400">Erro barato</div><p class="text-xs text-neutral-400 mt-1">dinheiro fica para depois</p></div>
+        <div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📝</div><div class="text-sm font-semibold text-blue-400">Frase de decisão</div><p class="text-xs text-neutral-400 mt-1">processo + custo</p></div>
+      </div>
+      <div class="flex justify-start mt-6">
+        <button type="button" data-inema-read-toggle aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors">
+          <span class="inema-read-icon" aria-hidden="true">○</span><span class="inema-read-label">Marcar como lido</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== RESUMO ===================== -->
+    <section class="mb-12">
+      <div class="bg-gradient-to-br from-blue-900/40 via-dark-800 to-dark-800 rounded-xl border border-blue-500/30 p-8">
+        <h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">🎓</span> Resumo do módulo</h2>
+        <div class="space-y-4 mb-8">
+          <div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Problema antes da ferramenta</strong><span class="text-neutral-400"> — o agente executa o plano, certo ou errado.</span></div></div>
+          <div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">A pergunta do 10×</strong><span class="text-neutral-400"> — o que quebraria primeiro já range hoje.</span></div></div>
+          <div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Quebra ≠ incomoda</strong><span class="text-neutral-400"> — perde cliente, dinheiro ou prazo? Então quebra.</span></div></div>
+          <div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Número decide, não palpite</strong><span class="text-neutral-400"> — tempo, dinheiro e erro por semana.</span></div></div>
+          <div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Um processo, só um</strong><span class="text-neutral-400"> — com a frase de decisão escrita.</span></div></div>
+        </div>
+        <div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+          <h3 class="font-semibold text-blue-400 mb-2">Próximo módulo:</h3>
+          <p class="text-neutral-300">2.2 — Pedido não é problema</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="index.html" class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors">← Voltar para a trilha</a>
+          <a href="modulo-2-2.html" class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors">Módulo 2.2 →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="hidden lg:block">
+    <nav data-inema-toc aria-label="Índice da página" class="sticky top-24">
+      <p class="text-sm text-neutral-400 mb-3"><span data-inema-section-counter>Seção 1 de 6</span></p>
+      <ol class="space-y-2 text-sm">
+        <li><a href="#topico-1" class="text-neutral-400 hover:text-blue-400">1. A pergunta do 10×</a></li>
+        <li><a href="#topico-2" class="text-neutral-400 hover:text-blue-400">2. Quebra × incomoda</a></li>
+        <li><a href="#topico-3" class="text-neutral-400 hover:text-blue-400">3. Números</a></li>
+        <li><a href="#topico-4" class="text-neutral-400 hover:text-blue-400">4. O que não dói</a></li>
+        <li><a href="#topico-5" class="text-neutral-400 hover:text-blue-400">5. Entrevista</a></li>
+        <li><a href="#topico-6" class="text-neutral-400 hover:text-blue-400">6. Só um</a></li>
+      </ol>
+    </nav>
+  </aside>
+  </div>
+
+  <footer class="border-t border-dark-600 py-8 mt-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+      <p>Agente sob Controle · 2026 | <a href="https://inema.club" target="_blank" class="text-sky-400 hover:text-sky-300">INEMA.CLUB</a> - <a href="https://inema.pro" target="_blank" class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200">PRO</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const _html = document.documentElement;
+    if (!_html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); }
+    else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      if (window.INEMA && INEMA.setPref) { INEMA.setPref('theme', _html.classList.contains('dark') ? 'claro' : 'inema-dark'); }
+      else { _html.classList.toggle('dark'); }
+      themeToggleDarkIcon.classList.toggle('hidden', _html.classList.contains('dark'));
+      themeToggleLightIcon.classList.toggle('hidden', !_html.classList.contains('dark'));
+      try { localStorage.setItem('theme', _html.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
+    });
+    function toggleTopic(button) {
+      const item = button.closest('.topic-item');
+      const exp = item.querySelector('.topic-explanation');
+      const card = button.closest('[id^="modulo-"]') || document;
+      card.querySelectorAll('.topic-explanation.active').forEach(e => { if (e !== exp) { e.classList.remove('active'); const b = e.parentElement.querySelector('[aria-controls]'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+      exp.classList.toggle('active');
+      button.setAttribute('aria-expanded', exp.classList.contains('active') ? 'true' : 'false');
+    }
+    let _lastModalTrigger = null;
+    function openModal(id){ const m=document.getElementById(id); if(m){ _lastModalTrigger=document.activeElement; m.classList.remove('hidden'); document.body.style.overflow='hidden'; const c=m.querySelector('button'); if(c) c.focus(); } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; if(_lastModalTrigger){ _lastModalTrigger.focus(); _lastModalTrigger=null; } }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+  <script src="../../assets/learn.js"></script>
+  <script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.INEMA && INEMA.registerCheck) {
+        INEMA.registerCheck('modulo-2-1#q1', { answer: 1, explain: {
+          '0': 'Postar aparece, mas custa pouco — é a armadilha da caixa vermelha. E trazer mais pacientes para uma agenda que já perde 9 de 38 só aumenta as faltas.',
+          '1': 'Isso. É um processo que quebra, tem número (9 faltas em 38 consultas) e o primeiro agente pode errar barato: um lembrete.',
+          '2': 'Três agentes de uma vez são três portas para controlar e nenhum jeito de saber qual funcionou. Um processo, só um.'
+        } });
+      }
+    });
+  </script>
+</body>
+</html>
