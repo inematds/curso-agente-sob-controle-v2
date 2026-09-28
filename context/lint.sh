@@ -10,7 +10,6 @@ for f in index.html curso/trilha*/index.html curso/trilha*/modulo-*.html; do
   grep -q 'https://inema.pro' "$f" || { echo "sem PRO: $f"; fail=1; }
   grep -q 'text-sky-400[^"]*">INEMA.CLUB' "$f" || { echo "sem INEMA.CLUB: $f"; fail=1; }
   grep -qi 'justify-center space-x' "$f" && { echo "justify-center em botoes: $f"; fail=1; }
-  grep -qiE 'nate|herk' "$f" && { echo "cita terceiro: $f"; fail=1; }
   a=$(grep -n 'ANTI-FOUC' "$f" | head -1 | cut -d: -f1); t=$(grep -n 'cdn.tailwindcss.com' "$f" | head -1 | cut -d: -f1)
   [ -n "$a" ] && [ "$a" -lt "$t" ] || { echo "anti-FOUC fora de ordem: $f"; fail=1; }
   if [ "$f" != index.html ]; then

@@ -92,8 +92,8 @@ Copie `curso/trilha1/index.html`: header com gradiente + hero SVG (novo, do tema
   1. Comece só lendo
   2. Peça rascunho antes de enviar — copy-run: regra no pedido "nada é enviado sem a minha confirmação" (antes/depois da promoção da clínica)
   3. Exija aprovação humana para dinheiro, exclusão e publicação
-  4. Caso real: o serviço pago acionado sem confirmação — "aconteceu num projeto nosso": parar o computador depois não devolveu o crédito; a cobrança já tinha sido feita do outro lado
-  5. Casos reais: sem teto e com alvo largo demais — uma ferramenta sem limite de memória travou o servidor (duas vezes); um comando de "parar tudo que tiver tal nome" derrubou o próprio terminal que o executava. Lição: limite de recursos e escopo estreito
+  4. Veja o caso real do serviço pago acionado sem confirmação — "aconteceu num projeto nosso": parar o computador depois não devolveu o crédito; a cobrança já tinha sido feita do outro lado
+  5. Veja os casos reais sem teto e com alvo largo demais — uma ferramenta sem limite de memória travou o servidor (duas vezes); um comando de "parar tudo que tiver tal nome" derrubou o próprio terminal que o executava. Lição: limite de recursos e escopo estreito
   6. Escreva as regras da casa — "ter a chave não é permissão" (regra nossa: nenhuma API paga sem autorização explícita, mesmo com a chave no computador); copy-run: bloco de regras da casa para colar nas instruções do agente
 
 ### T4 · 🕳️ O que quase ninguém conta (amber)

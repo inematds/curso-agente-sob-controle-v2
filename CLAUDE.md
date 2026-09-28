@@ -14,3 +14,5 @@ Curso "Agente sob Controle" no formato `formato-curso-v2` (5 trilhas, 11 módulo
 When I correct you, or you catch yourself making a mistake: before continuing, add the lesson as a one-line rule under ## Lessons, so it never happens again.
 
 ## Lessons
+
+- Antes de disparar agentes paralelos que copiam de um arquivo-modelo, congelar o modelo (nenhum agente edita ele) e mandar cortar por marcador de texto, nunca por número de linha.
