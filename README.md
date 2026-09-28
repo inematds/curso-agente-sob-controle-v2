@@ -23,5 +23,6 @@ Para quem tem um pequeno negócio e começa a usar agentes de IA: escolher o pro
 
 ## Mais no INEMA.CLUB
 
+- [Ficha deste curso](https://www.inema.club/cursos/305-agente-sob-controle-v2-use-agentes-de-ia-sem-se-queimar/)
 - [Guia: como aprender inteligência artificial](https://www.inema.club/aprender-inteligencia-artificial/)
 - [Todos os cursos](https://www.inema.club/cursos/)
