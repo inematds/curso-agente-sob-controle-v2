@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="agscv2" name="inema-course"/>
+<title>Más capaz, más límites | Agente bajo Control</title>
+<!-- ANTI-FOUC: bloqueante, ANTES do Tailwind -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; }
+        } else {
+          var legacy = localStorage.getItem('theme');
+          if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark';
+        }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = {
+        'inema-dark': { dark: true,  attr: null,        cs: 'dark'  },
+        'claro':      { dark: false, attr: null,        cs: 'light' },
+        'sepia':      { dark: false, attr: 'sepia',     cs: 'light' },
+        'foco':       { dark: null,  attr: 'foco',      cs: null    },
+        'contraste':  { dark: true,  attr: 'contraste', cs: 'dark'  }
+      };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+      html.setAttribute('data-font', p.font || 'inter');
+      html.setAttribute('data-accent', p.accent || 'emerald');
+      var s = html.style; var scale = (+p.fontScale || 100);
+      s.setProperty('--inema-font-scale', (scale / 100).toString());
+      s.setProperty('font-size', scale + '%');
+      s.setProperty('--measure', (+p.lineWidth || 68) + 'ch');
+      s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+      var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+        : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC = { emerald: [152,76,45], blue: [217,91,60], purple: [258,90,66], amber: [38,92,50], teal: [174,72,41], rose: [350,89,60] };
+      var a = ACC[p.accent] || ACC.emerald;
+      s.setProperty('--accent-h', a[0]+''); s.setProperty('--accent-s', a[1]+'%'); s.setProperty('--accent-l', a[2]+'%');
+      s.setProperty('--accent', 'hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch(e){} }
+  })();
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: {
+      primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<!-- Manifesto do curso (OBRIGATORIO em TODA pagina, identico) -->
+<script data-inema-manifest="" type="application/json">
+  {"course":"agscv2","tracks":[{"n":"1","title":"Por que agora","modules":[{"id":"1-1","title":"Responder não é agir","topics":6,"href":"curso/trilha1/modulo-1-1.html"},{"id":"1-2","title":"Mais capaz, mais limites","topics":6,"href":"curso/trilha1/modulo-1-2.html"}]},{"n":"2","title":"Achar a dor","modules":[{"id":"2-1","title":"A pergunta do 10×","topics":6,"href":"curso/trilha2/modulo-2-1.html"},{"id":"2-2","title":"Pedido não é problema","topics":6,"href":"curso/trilha2/modulo-2-2.html"}]},{"n":"3","title":"Controlar o sistema","modules":[{"id":"3-1","title":"As cinco chaves","topics":6,"href":"curso/trilha3/modulo-3-1.html"},{"id":"3-2","title":"Três regras e casos reais","topics":6,"href":"curso/trilha3/modulo-3-2.html"}]},{"n":"4","title":"O que quase ninguém conta","modules":[{"id":"4-1","title":"Ordens escondidas","topics":6,"href":"curso/trilha4/modulo-4-1.html"},{"id":"4-2","title":"Senhas e extensões","topics":6,"href":"curso/trilha4/modulo-4-2.html"},{"id":"4-3","title":"Gasto, isolamento e LGPD","topics":6,"href":"curso/trilha4/modulo-4-3.html"}]},{"n":"5","title":"Assumir o resultado","modules":[{"id":"5-1","title":"Métrica com dono","topics":6,"href":"curso/trilha5/modulo-5-1.html"},{"id":"5-2","title":"A planilha em 4 blocos","topics":6,"href":"curso/trilha5/modulo-5-2.html"}]}]}
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-200 { color: #1f2937; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #6b7280; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+
+    /* Light mode - acentos das 5 trilhas (emerald, blue, purple, amber, teal) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(217, 119, 6, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(217, 119, 6, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(217, 119, 6, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(217, 119, 6, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+    html:not(.dark) .text-teal-400 { color: #0d9488; }
+    html:not(.dark) .bg-teal-500\/20 { background-color: rgba(13, 148, 136, 0.12); }
+    html:not(.dark) .bg-teal-500\/10 { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .bg-teal-900\/20 { background-color: rgba(13, 148, 136, 0.07); }
+    html:not(.dark) .border-teal-500\/30 { border-color: rgba(13, 148, 136, 0.25); }
+    html:not(.dark) .hover\:bg-teal-500\/30:hover { background-color: rgba(13, 148, 136, 0.18); }
+    html:not(.dark) .hover\:text-teal-400:hover { color: #0d9488; }
+    html:not(.dark) .hover\:bg-teal-500\/10:hover { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-teal-400 { color: #0d9488; }
+
+    /* Light mode - remove gradientes e cores especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/40 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.22); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.06); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+
+    /* Light mode - nav */
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* Alvos de ancora abaixo do nav sticky */
+    [data-inema-topic], [id^="modulo-"], [id^="topico-"] { scroll-margin-top: 72px; }
+
+    /* SVG light mode + animacao */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-dash { to { stroke-dashoffset: -24; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+      .wf-flow { stroke-dasharray: 6 6; animation: wf-dash 1.2s linear infinite; }
+    }
+
+    /* Topicos expansiveis */
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+  </style>
+<link href="https://inematds.github.io/curso-agente-sob-controle-v2/curso/trilha1/modulo-1-2.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/en/curso/trilha1/modulo-1-2.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/es/curso/trilha1/modulo-1-2.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha1/modulo-1-2.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../../../en/curso/trilha1/modulo-1-2.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="modulo-1-2.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<a class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-black focus:rounded-lg" href="#conteudo">Saltar al contenido</a>
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-3">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🛡️</span>
+<span class="font-bold text-lg hidden lg:inline">Agente bajo Control</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+<span class="text-neutral-600">-</span>
+<a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200 text-sm font-medium" href="https://inema.pro" target="_blank">PRO</a>
+</div>
+<div class="flex items-center space-x-1">
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-emerald-400 bg-emerald-500/10" href="index.html">
+<span class="xl:hidden">T1</span><span class="hidden xl:inline">Por qué ahora</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="xl:hidden">T2</span><span class="hidden xl:inline">Identifica el problema</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="xl:hidden">T3</span><span class="hidden xl:inline">Control</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors" href="../trilha4/index.html">
+<span class="xl:hidden">T4</span><span class="hidden xl:inline">Riesgos ocultos</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-teal-400 hover:bg-teal-500/10 transition-colors" href="../trilha5/index.html">
+<span class="xl:hidden">T5</span><span class="hidden xl:inline">Resultado</span>
+</a>
+<button class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-journey-open="" title="Mi recorrido" type="button">
+<span aria-hidden="true">◷</span><span class="hidden md:inline">Recorrido</span>
+<span class="inema-journey-badge" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<div class="relative">
+<button aria-controls="aparencia" aria-expanded="false" class="p-2 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-appearance-toggle="#aparencia" title="Apariencia" type="button">
+<span aria-hidden="true" class="text-sm font-semibold">Aa</span><span class="sr-only">Apariencia</span>
+</button>
+<div class="inema-appearance-pop" data-inema-appearance="" id="aparencia">
+<div aria-label="Tema" class="inema-segment">
+<button data-inema-set-theme="inema-dark" type="button">Oscuro</button>
+<button data-inema-set-theme="claro" type="button">Claro</button>
+<button data-inema-set-theme="sepia" type="button">Sepia</button>
+<button data-inema-set-theme="foco" type="button">Enfoque</button>
+<button data-inema-set-theme="contraste" type="button">Alto contraste</button>
+</div>
+<div aria-label="Fuente" class="inema-segment">
+<button data-inema-set-font="inter" type="button">Inter</button>
+<button data-inema-set-font="system" type="button">Sistema</button>
+<button data-inema-set-font="leitura" type="button">Lectura</button>
+</div>
+<div aria-label="Tamaño del texto" class="inema-segment">
+<button data-inema-set-fontscale="100" type="button">A</button>
+<button data-inema-set-fontscale="112" type="button">A+</button>
+<button data-inema-set-fontscale="125" type="button">A++</button>
+</div>
+<div aria-label="Ancho de línea" class="inema-segment">
+<button data-inema-set-linewidth="60" type="button">Estrecho</button>
+<button data-inema-set-linewidth="68" type="button">Medio</button>
+<button data-inema-set-linewidth="75" type="button">Ancho</button>
+</div>
+<div aria-label="Entre líneas" class="inema-segment">
+<button data-inema-set-leading="1.45" type="button">Compacto</button>
+<button data-inema-set-leading="1.7" type="button">Cómodo</button>
+</div>
+</div>
+</div>
+<button aria-label="Alternar tema claro/oscuro" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<nav aria-label="Ruta de navegación" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-emerald-400" href="../../index.html">Inicio</a><span>/</span>
+<a class="hover:text-emerald-400" href="index.html">Ruta 1</a><span>/</span>
+<span class="text-emerald-400">Módulo 1.2</span>
+</div>
+</nav>
+<header class="bg-gradient-to-br from-emerald-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="1-2" data-inema-track="1">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full mb-4">MÓDULO 1.2</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">⚖️ Más capacidad, más límites</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">La misma fuerza que organiza tu negocio también puede desordenarlo. Por qué esto se volvió algo serio ahora, las señales de un agente con demasiada libertad y el agente que vas a crear a lo largo del curso.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">6</div><div class="text-xs text-neutral-400">Temas</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">~30</div><div class="text-xs text-neutral-400">Minutos</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Base</div><div class="text-xs text-neutral-400">Nivel</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-emerald-400">Misma fuerza</div><div class="text-xs text-neutral-400">Idea</div></div>
+</div>
+<div aria-label="Progreso del módulo 1.2" aria-valuemax="100" aria-valuemin="0" class="mt-6 max-w-2xl" data-inema-meter="modulo:1-2" role="progressbar">
+<div class="flex justify-between text-xs text-neutral-400 mb-1"><span data-inema-meter-frac="">0 de 6</span><span data-inema-meter-pct="">0%</span></div>
+<div class="inema-bar"><div class="inema-bar__fill" data-inema-meter-fill=""></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[1fr_220px] lg:gap-10">
+<main class="min-w-0" data-inema-module="1-2" data-inema-track="1" id="conteudo">
+<!-- ===================== TOPICO 1 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-1" id="topico-1">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl">1</span>
+<h2 class="text-2xl font-bold flex-1">Mira la misma fuerza de ambos lados</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m1-2-t1-p1">Las IA más recientes ya encuentran fallas de seguridad en sistemas que los especialistas no habían detectado. Quienes las defienden usan esto para corregir la falla. Quienes atacan las usan para entrar. <strong class="text-emerald-400">La capacidad es la misma.</strong></p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t1-p2">En tu negocio pasa lo mismo, a menor escala. El agente que organiza la bandeja de entrada en diez minutos es el mismo que, ante una solicitud mal entendida, archiva o borra toda la bandeja en diez minutos. Lo que cambia el rumbo es <strong>quién controla</strong> e <strong>lo que tiene permiso para hacer</strong>.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Una balanza. En el centro, una caja llamada «misma capacidad». El plato de la izquierda, verde, muestra usos a tu favor: organiza la caja, encuentra la falla para corregirla, recuerda al cliente. El plato de la derecha, rojo, muestra esos mismos poderes en tu contra: borra la caja, encuentra la falla para invadir, envía el mensaje equivocado a todos. Debajo del fiel de la balanza está escrito: quienes deciden de qué lado cae son los límites." class="w-full h-auto" role="img" viewbox="0 0 800 270">
+<defs>
+<pattern height="32" id="m12-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#34d399" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m12-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<lineargradient id="m12-grad" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#34d399"></stop><stop offset="1" stop-color="#10b981"></stop></lineargradient>
+</defs>
+<rect fill="url(#m12-grid)" height="270" width="800" x="0" y="0"></rect>
+<line stroke="#6b7280" stroke-width="3" x1="400" x2="400" y1="110" y2="225"></line>
+<path d="M360,232 L440,232 L400,212 z" fill="#374151" stroke="#6b7280" stroke-width="2"></path>
+<line stroke="#9ca3af" stroke-width="3" x1="140" x2="660" y1="110" y2="110"></line>
+<line stroke="#9ca3af" stroke-width="2" x1="140" x2="140" y1="110" y2="128"></line>
+<line stroke="#9ca3af" stroke-width="2" x1="660" x2="660" y1="110" y2="128"></line>
+<g filter="url(#m12-glow)"><rect fill="#0e2018" height="56" rx="14" stroke="url(#m12-grad)" stroke-width="2" width="170" x="315" y="36"></rect></g>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="400" y="60">la misma capacidad</text>
+<text fill="#a7f3d0" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="79">leer · decidir · actuar rápido</text>
+<line class="wf-flow" stroke="#38bdf8" stroke-width="2" x1="400" x2="400" y1="92" y2="108"></line>
+<g font-family="Inter,sans-serif" font-size="12">
+<rect fill="#0e2018" height="92" rx="12" stroke="#34d399" stroke-width="2" width="220" x="30" y="130"></rect>
+<text fill="#34d399" font-size="13" font-weight="600" text-anchor="middle" x="140" y="151">a tu favor</text>
+<text fill="#a7f3d0" x="48" y="174">✓ organiza la bandeja de entrada</text>
+<text fill="#a7f3d0" x="48" y="193">✓ encuentra el error para corregirlo</text>
+<text fill="#a7f3d0" x="48" y="212">✓ le recuerda al cliente su cita</text>
+<rect fill="#3b0d0d" height="92" rx="12" stroke="#f87171" stroke-width="2" width="220" x="550" y="130"></rect>
+<text fill="#fca5a5" font-size="13" font-weight="600" text-anchor="middle" x="660" y="151">en tu contra</text>
+<text fill="#fecaca" x="568" y="174">✗ borra toda la caja</text>
+<text fill="#fecaca" x="568" y="193">✗ encuentra la falla para entrar</text>
+<text fill="#fecaca" x="568" y="212">✗ avisa a todos, con error</text>
+</g>
+<text fill="#38bdf8" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="400" y="256">quién decide hacia dónde se inclina: los límites que estableces</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Cómo leer el dibujo:</strong> fíjate en que cada línea de la izquierda tiene su par a la derecha: es el mismo poder usado de otra manera. El recuadro del medio no cambia. Lo que decide hacia dónde se inclina la balanza está escrito debajo del punto de apoyo: los límites.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ El agente de Renata, bien utilizado</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Lee la agenda y prepara los recordatorios de mañana.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Muestra la lista y el texto antes de enviarlos.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Ahorra una hora al día en recepción.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ El mismo agente, sin control</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Entiende «limpia la agenda del viernes» como «cancela todo».</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Avisa a las 14 pacientes de la cancelación, sin mostrarlo antes.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>La recepción pasa el lunes reprogramando citas.</span></li>
+</ul>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⚖️</div><div class="text-sm font-semibold text-emerald-400">Misma fuerza</div><p class="text-xs text-neutral-400 mt-1">sirve a ambas partes</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🛡️</div><div class="text-sm font-semibold text-emerald-400">Defensa</div><p class="text-xs text-neutral-400 mt-1">encuentra el fallo y lo corrige</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🗑️</div><div class="text-sm font-semibold text-emerald-400">Daño</div><p class="text-xs text-neutral-400 mt-1">a la misma velocidad</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🚧</div><div class="text-sm font-semibold text-emerald-400">Límite</div><p class="text-xs text-neutral-400 mt-1">decide el lado</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Marcar como leído</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 2 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-2" id="topico-2">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl">2</span>
+<h2 class="text-2xl font-bold flex-1">Entiende por qué los agentes ahora son capaces</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m1-2-t2-p1">Tres cosas llegaron al mismo tiempo. Los <strong class="text-emerald-400">modelos</strong> mejoraron en la planificación de varios pasos. Ganaron <strong class="text-emerald-400">herramientas</strong> para actuar. Y los <strong class="text-emerald-400">conectores</strong> se convirtieron en un botón: "conectar a Gmail", "permitir".</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t2-p2">Antes, conectar una IA a tu agenda requería un programador y semanas. Hoy, cualquiera puede hacerlo en minutos, desde el celular, sin leer lo que está autorizando. La facilidad es excelente. La precaución no vino con ella.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Tres cajas a la izquierda —modelos mejores, herramientas y conectores de un clic— con flechas que convergen en una caja central brillante: agente conectado en minutos. De ella sale una flecha hacia una caja a la derecha, con un reloj: controles, que suelen dejarse para después." class="w-full h-auto" role="img" viewbox="0 0 800 250">
+<defs>
+<pattern height="32" id="m12b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#34d399" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m12b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m12b-arrow" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+<marker id="m12b-arrow-g" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"></path></marker>
+</defs>
+<rect fill="url(#m12b-grid)" height="250" width="800" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" font-size="13" text-anchor="middle">
+<rect class="wf-a" fill="#0b1f2e" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="190" x="30" y="30"></rect>
+<text fill="#bae6fd" x="125" y="59">🧠 modelos mejores</text>
+<rect class="wf-a" fill="#0b1f2e" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="190" x="30" y="101"></rect>
+<text fill="#bae6fd" x="125" y="130">🧰 herramientas</text>
+<rect class="wf-a" fill="#0b1f2e" height="48" rx="12" stroke="#38bdf8" stroke-width="2" width="190" x="30" y="172"></rect>
+<text fill="#bae6fd" x="125" y="201">🔌 conector de 1 clic</text>
+</g>
+<path class="wf-flow" d="M222,54 C 270,54 280,110 318,120" fill="none" marker-end="url(#m12b-arrow)" stroke="#38bdf8" stroke-width="2"></path>
+<line class="wf-flow" marker-end="url(#m12b-arrow)" stroke="#38bdf8" stroke-width="2" x1="222" x2="316" y1="125" y2="125"></line>
+<path class="wf-flow" d="M222,196 C 270,196 280,140 318,130" fill="none" marker-end="url(#m12b-arrow)" stroke="#38bdf8" stroke-width="2"></path>
+<g filter="url(#m12b-glow)"><rect fill="#0e2018" height="66" rx="14" stroke="#34d399" stroke-width="2" width="190" x="322" y="92"></rect></g>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="417" y="121">agente activo</text>
+<text fill="#a7f3d0" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="417" y="141">en minutos</text>
+<line marker-end="url(#m12b-arrow-g)" stroke="#9ca3af" stroke-dasharray="4 5" stroke-width="2" x1="514" x2="584" y1="125" y2="125"></line>
+<rect fill="#1f2937" height="66" rx="14" stroke="#4b5563" stroke-width="2" width="182" x="588" y="92"></rect>
+<text fill="#d1d5db" font-family="Inter,sans-serif" font-size="13" text-anchor="middle" x="679" y="121">⏳ controles</text>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="679" y="141">"después lo veo"</text>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="417" y="200">activar se volvió rápido · controlar sigue siendo trabajoso</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Cómo leer el dibujo:</strong> las tres flechas azules son continuas y rápidas: es lo que impulsa al agente hacia tu vida. La flecha hacia "controles" es punteada y gris: es el paso que casi todos se saltan. Este curso existe para cubrir esa parte de la derecha.</p>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-emerald-400"><tr><th class="px-4 py-3 font-semibold">Qué cambió</th><th class="px-4 py-3 font-semibold">Antes</th><th class="px-4 py-3 font-semibold">Ahora</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🧠 Modelo</td><td class="px-4 py-3 text-neutral-300">respondía una pregunta</td><td class="px-4 py-3 text-neutral-300">planifica y ejecuta varios pasos</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🧰 Herramientas</td><td class="px-4 py-3 text-neutral-300">solo texto en pantalla</td><td class="px-4 py-3 text-neutral-300">correo, agenda, hoja de cálculo, navegador</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🔌 Conexión</td><td class="px-4 py-3 text-neutral-300">programador, semanas</td><td class="px-4 py-3 text-neutral-300">un botón, minutos</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🙋 A quién le importa</td><td class="px-4 py-3 text-neutral-300">el equipo de TI</td><td class="px-4 py-3 text-neutral-300">cualquier persona de la oficina</td></tr>
+</tbody>
+</table>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Fíjate en la última línea</h3>
+<p class="text-neutral-300 text-sm">En la oficina de Marcos, quien activó el primer agente no fue él: fue Júlia, la asistente, probando una aplicación en el celular. Cuando cualquiera puede activarlo, alguien necesita saber qué está activo: ese es el inventario del módulo 1.1.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🧠</div><div class="text-sm font-semibold text-emerald-400">Modelo</div><p class="text-xs text-neutral-400 mt-1">planifica varios pasos</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔌</div><div class="text-sm font-semibold text-emerald-400">1 clic</div><p class="text-xs text-neutral-400 mt-1">activar se volvió fácil</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏱️</div><div class="text-sm font-semibold text-emerald-400">Minutos</div><p class="text-xs text-neutral-400 mt-1">sin programador</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏳</div><div class="text-sm font-semibold text-emerald-400">Control</div><p class="text-xs text-neutral-400 mt-1">queda para después</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Marcar como leído</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 3 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-3" id="topico-3">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl">3</span>
+<h2 class="text-2xl font-bold flex-1">Aplica la regla del empleado nuevo</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m1-2-t3-p1">Nadie le entrega la contraseña del banco a un empleado el primer día. Empieza observando, después trabaja con supervisión y solo obtiene autonomía cuando demuestra que acierta. <strong class="text-emerald-400">Trata al agente de la misma manera.</strong></p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t3-p2">La diferencia es que el empleado nuevo tiene miedo de equivocarse. El agente no. Ejecuta una solicitud mal entendida con la misma confianza que una correcta. Por eso el acceso crece <strong>poco a poco</strong>, y cada paso es una decisión tuya.</p>
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6 mb-6">
+<h3 class="text-base font-semibold text-emerald-400 mb-2 flex items-center"><span class="mr-2">🆕</span> ¿Eres nuevo aquí? Qué es «aprobación»</h3>
+<p class="text-neutral-300 text-sm"><strong>Aprobación</strong> es el momento en que el agente se detiene, muestra lo que va a hacer y espera tu «adelante». Sin ella, el borrador se envía directamente. Con ella, el error aparece en tu pantalla antes de llegar al cliente. La aprobación es el control más barato que existe.</p>
+</div>
+<div class="space-y-5 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Semana 1 · solo lee</h4><p class="text-neutral-300 text-sm">El agente de Renata lee la agenda y dice quién tiene una consulta mañana. No escribe en ningún lugar.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Semana 2 · prepara borradores</h4><p class="text-neutral-300 text-sm">Escribe los recordatorios, pero no los envíes. La recepción los revisa y los envía.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><span class="text-emerald-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Mes 1 · envía con aprobación</h4><p class="text-neutral-300 text-sm">Muestra la lista y el texto; Renata aprueba con un toque; él lo envía y anota lo que hizo.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-900/40 flex items-center justify-center"><span class="text-red-400 font-bold">✗</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-red-500/30"><h4 class="font-semibold text-red-400 mb-1">Nunca a solas · dinero, eliminación, publicación</h4><p class="text-neutral-300 text-sm">Los cobros, los reembolsos, la eliminación de registros o las publicaciones para todos siguen pasando por Renata, incluso después de meses de ajustes.</p></div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Vista previa de la Ruta 3</h3>
+<p class="text-neutral-300 text-sm">Esta escalera se convierte en método en el módulo 3.1, con cinco claves: qué puede hacer <strong>leer</strong>, lo que puede <strong>cambiar</strong>, lo que necesita <strong>aprobación</strong>, donde está el <strong>registro</strong> y quién presiona el <strong>botón de apagado</strong>. Por ahora, quédate con la idea: el acceso se gana, no se entrega de una vez.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">👀</div><div class="text-sm font-semibold text-emerald-400">Solo leer</div><p class="text-xs text-neutral-400 mt-1">el primer escalón</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📝</div><div class="text-sm font-semibold text-emerald-400">Borrador</div><p class="text-xs text-neutral-400 mt-1">escribe, no envía</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">✅</div><div class="text-sm font-semibold text-emerald-400">Aprobación</div><p class="text-xs text-neutral-400 mt-1">tu "puedes" de antemano</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🪜</div><div class="text-sm font-semibold text-emerald-400">Poco a poco</div><p class="text-xs text-neutral-400 mt-1">el acceso se gana</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Marcar como leído</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 4 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-4" id="topico-4">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl">4</span>
+<h2 class="text-2xl font-bold flex-1">Reconoce las señales de que un agente tiene demasiada libertad</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m1-2-t4-p1">Un agente demasiado libre no avisa que tiene demasiada libertad. Funciona, ahorra tiempo y a todos les gusta, hasta el día en que se equivoca. Las señales aparecen antes, para quien se fija.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t4-p2">Compara las dos columnas con el agente que usas o piensas usar. <strong class="text-emerald-400">Dos o más elementos de la columna roja ya indican que hay que detenerse.</strong></p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Demasiado suelto</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Tiene acceso a todo «para que no haya errores de permisos».</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Envía, borra o paga sin mostrarlo antes.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Nadie sabe cómo apagarlo ni quién puede hacerlo.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No hay historial de lo que hizo ayer.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Nadie es responsable: "fue el sistema".</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Se ejecuta de madrugada sin límite de gasto.</span></li>
+</ul>
+</div>
+<div class="bg-emerald-900/20 rounded-xl border border-emerald-500/30 p-6">
+<h4 class="font-bold text-emerald-400 mb-4">✓ Bajo control</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Accede solo a lo que necesita la tarea.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Muestra el borrador y espera aprobación para lo que sale al exterior.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Tiene un botón de apagado que cualquiera puede encontrar en 1 minuto.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Deja un registro: qué hizo, cuándo y para quién.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Tiene una persona responsable, con nombre, que revisa los errores.</span></li>
+<li class="flex items-start space-x-2"><span class="text-emerald-400">✓</span><span>Tiene un límite de gasto y de intentos.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-2 flex items-center"><span class="mr-2">⚠️</span> La señal más peligrosa</h3>
+<p class="text-neutral-300 text-sm">"Nadie sabe cómo apagarlo." Si el agente empieza a equivocarse repetidamente, cada minuto que pases buscando el botón es un minuto más de daño. Antes de activarlo, acuerden quién lo apaga y cómo hacerlo, y pruébenlo una vez.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-6 mb-6" data-inema-check="modulo-1-2#q1">
+<p class="font-medium mb-4">Prueba rápida (opcional): el robot de WhatsApp de Marcos responde a los clientes por su cuenta, nadie sabe dónde ver lo que respondió ayer, pero solo Júlia sabe cómo apagarlo. ¿Cuál es la señal más urgente?</p>
+<div class="space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">Responde demasiado rápido.</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">Responde sin mostrarlo antes y no deja un historial.</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">Solo Júlia sabe cómo apagarlo, así que todo está bien.</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔓</div><div class="text-sm font-semibold text-emerald-400">Acceso a todo</div><p class="text-xs text-neutral-400 mt-1">demasiadas puertas abiertas</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📜</div><div class="text-sm font-semibold text-emerald-400">Registro</div><p class="text-xs text-neutral-400 mt-1">lo que hizo ayer</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔴</div><div class="text-sm font-semibold text-emerald-400">Botón de apagado</div><p class="text-xs text-neutral-400 mt-1">encontrado en 1 minuto</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🙋</div><div class="text-sm font-semibold text-emerald-400">Responsable</div><p class="text-xs text-neutral-400 mt-1">un nombre, no "el sistema"</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Marcar como leído</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 5 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-5" id="topico-5">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl">5</span>
+<h2 class="text-2xl font-bold flex-1">Haz la prueba de «¿y si sale mal?»</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m1-2-t5-p1">Antes de activar un agente, dedica diez minutos a imaginar lo peor. No para desistir: para saber <strong class="text-emerald-400">dónde poner el límite</strong>. Un chat de IA es excelente para eso: piensa en situaciones en las que tú no pensarías.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t5-p2">La prueba funciona mejor con cifras de tu negocio: cuántos clientes, cuánto vale cada atención, cuánto tiempo lleva corregirlo. El costo convierte un miedo vago en una decisión.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-emerald-900/20 border-b border-emerald-500/30"><span class="text-emerald-400 font-semibold text-sm">🎯 Objetivo: salir con los 5 peores escenarios de tu agente y cuánto costaría cada uno</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Pégalo en el chat de IA que ya usas (ChatGPT, Claude, Gemini). Cambia lo que está entre &lt; &gt;. No pegues nombres de clientes.</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">Vou ligar um agente de IA no meu negócio e quero pensar no pior antes.
+
+Meu negócio: &lt;ex.: clínica de estética, 2 funcionárias, 300 pacientes ativas&gt;.
+O que o agente vai fazer: &lt;ex.: confirmar consultas e remarcar quem pedir&gt;.
+Ferramentas que ele vai usar: &lt;ex.: agenda, WhatsApp da clínica, planilha de pacientes&gt;.
+O que ele pode fazer sozinho: &lt;ex.: ler, escrever mensagens, remarcar&gt;.
+Valor médio de um atendimento: &lt;ex.: R$ 120&gt;.
+
+Liste os 5 piores cenários realistas deste agente, do mais caro para o mais barato.
+Para cada um, escreva:
+1. o que acontece, em uma frase;
+2. quantas pessoas ou quanto dinheiro são atingidos;
+3. quanto custaria em reais e em horas de trabalho para consertar;
+4. se dá para desfazer ou não;
+5. o limite que evitaria o problema (ex.: aprovação, só leitura, teto de envios).
+
+Use só os números que eu dei. Onde precisar estimar, escreva "estimativa".
+No fim, diga qual limite resolve o maior número de cenários.</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-emerald-400">Cómo verificar:</strong> tienes 5 escenarios, cada uno con un valor en reales y un límite. Al menos uno debe estar marcado como "no se puede deshacer": es en ese caso cuando la aprobación se vuelve obligatoria.</div>
+</div>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-emerald-400"><tr><th class="px-4 py-3 font-semibold">Escenario de Renata</th><th class="px-4 py-3 font-semibold">Costo</th><th class="px-4 py-3 font-semibold">¿Se puede deshacer?</th><th class="px-4 py-3 font-semibold">Límite</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Cancela las consultas de un día entero</td><td class="px-4 py-3 text-neutral-300">14 × R$ 120 = R$ 1.680</td><td class="px-4 py-3 text-red-400">en parte</td><td class="px-4 py-3 text-neutral-300">cancelar solo con aprobación</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Envía un recordatorio a quien no tiene una cita</td><td class="px-4 py-3 text-neutral-300">1 tarde de disculpas</td><td class="px-4 py-3 text-red-400">no</td><td class="px-4 py-3 text-neutral-300">mostrar la lista antes</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Reprograma a dos pacientes para el mismo horario</td><td class="px-4 py-3 text-neutral-300">1 atención perdida</td><td class="px-4 py-3 text-emerald-400">sí</td><td class="px-4 py-3 text-neutral-300">registro de cambios</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Qué observar en la tabla:</strong> La columna "¿Se puede deshacer?" pesa más que la de costo. Un error barato que no se puede deshacer (un mensaje leído) requiere más control que un error caro que sí se puede corregir.</p>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Marcar como leído</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 6 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-1-2#topico-6" id="topico-6">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xl">6</span>
+<h2 class="text-2xl font-bold flex-1">Elige el agente que vas a llevar por el curso</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>Tengo una duda</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m1-2-t6-p1">A partir de aquí, el curso se vuelve práctico. Cada ruta te pedirá que apliques lo que aprendiste a <strong class="text-emerald-400">un agente de verdad</strong> — el tuyo. Puede ser uno que ya existe o uno que piensas conectar.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m1-2-t6-p2">Elige uno solo, pequeño y relacionado con el día a día. Si todavía no sabes cuál, escribe tu mejor opción: en la Ruta 2 comprobarás si atiende el dolor adecuado y podrás cambiarlo.</p>
+<div class="rounded-2xl border border-emerald-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Una tarjeta llamada «mi agente», con un brillo, a la izquierda. De ella sale una línea que pasa por cuatro paradas, una por cada recorrido: en T2 verifica el problema, en T3 incorpora los cinco controles, en T4 cierra las puertas de seguridad y en T5 incorpora una métrica y una persona responsable." class="w-full h-auto" role="img" viewbox="0 0 800 220">
+<defs>
+<pattern height="32" id="m12c-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#34d399" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m12c-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+</defs>
+<rect fill="url(#m12c-grid)" height="220" width="800" x="0" y="0"></rect>
+<line class="wf-flow" stroke="#38bdf8" stroke-width="2" x1="170" x2="770" y1="110" y2="110"></line>
+<g filter="url(#m12c-glow)"><rect fill="#0e2018" height="80" rx="14" stroke="#34d399" stroke-width="2" width="150" x="20" y="70"></rect></g>
+<text fill="#34d399" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="95" y="104">📋 mi agente</text>
+<text fill="#a7f3d0" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="95" y="126">elegido en la T1</text>
+<g font-family="Inter,sans-serif" font-size="12" text-anchor="middle">
+<circle cx="260" cy="110" fill="#111827" r="10" stroke="#60a5fa" stroke-width="3"></circle>
+<text fill="#60a5fa" font-weight="600" x="260" y="80">T2</text><text fill="#bfdbfe" x="260" y="145">confirma el problema</text>
+<circle cx="420" cy="110" fill="#111827" r="10" stroke="#c084fc" stroke-width="3"></circle>
+<text fill="#c084fc" font-weight="600" x="420" y="80">T3</text><text fill="#e9d5ff" x="420" y="145">gana 5 controles</text>
+<circle cx="580" cy="110" fill="#111827" r="10" stroke="#fbbf24" stroke-width="3"></circle>
+<text fill="#fbbf24" font-weight="600" x="580" y="80">T4</text><text fill="#fde68a" x="580" y="145">cierra las puertas</text>
+<circle cx="740" cy="110" fill="#111827" r="10" stroke="#2dd4bf" stroke-width="3"></circle>
+<text fill="#2dd4bf" font-weight="600" x="740" y="80">T5</text><text fill="#99f6e4" x="740" y="145">métrica y responsable</text>
+</g>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="500" y="195">la misma tarjeta vuelve en cada ruta y gana una capa</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">Cómo leer el dibujo:</strong> la tarjeta verde es lo que completas ahora. La línea azul es su recorrido por el curso; en cada parada de color gana una capa. Cuanto más concreta sea la tarjeta de hoy, más útil será cada parada.</p>
+<div class="bg-dark-800 rounded-xl border border-emerald-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-emerald-900/20 border-b border-emerald-500/30"><span class="text-emerald-400 font-semibold text-sm">🎯 Objetivo: completar la tarjeta "Mi agente" y guardarla para las próximas rutas</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Copia en las Notas del celular o en un documento. Cambia lo que está entre &lt; &gt;. Si quieres, pégalo en un chat de IA y pide: "hazme una pregunta a la vez hasta completar esta tarjeta".</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">MEU AGENTE
+Nome curto: &lt;ex.: confirmador de consultas&gt;
+Tarefa (uma frase): &lt;ex.: confirmar as consultas do dia seguinte e anotar quem pediu para remarcar&gt;
+Já existe ou vou ligar? &lt;existe / vou ligar&gt;
+Ferramentas que ele usa: &lt;ex.: agenda, WhatsApp da clínica&gt;
+O que ele pode fazer sozinho hoje: &lt;ler / escrever rascunho / enviar / apagar / pagar&gt;
+Quem usa no dia a dia: &lt;ex.: recepção&gt;
+Quem manda nele (dono): &lt;seu nome&gt;
+Pior cenário (do teste "e se der errado?"): &lt;uma frase + custo&gt;
+Data de hoje: &lt;dd/mm/aaaa&gt;</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-emerald-400">Cómo verificar:</strong> ninguna línea en blanco y la tarea cabe en una frase. Si la tarea tiene demasiadas «y» («confirma, cobra y publica en Instagram»), son tres agentes; quédate con uno.</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> La tarjeta de Marcos</h3>
+<p class="text-neutral-300 text-sm">"Gestor de documentos: lee la lista de pendientes de cada cliente y prepara el mensaje de WhatsApp para pedir lo que falta. Voy a conectarlo. Herramientas: hoja de cálculo de pendientes, WhatsApp de la oficina. Por su cuenta: solo borradores. Quién lo usa: Júlia. Responsable: Marcos. Peor escenario: pedirle un documento a alguien que ya lo entregó — cliente molesto, media hora de llamada."</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">1️⃣</div><div class="text-sm font-semibold text-emerald-400">Uno solo</div><p class="text-xs text-neutral-400 mt-1">pequeño y cotidiano</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">✍️</div><div class="text-sm font-semibold text-emerald-400">Una frase</div><p class="text-xs text-neutral-400 mt-1">toda la tarea</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🙋</div><div class="text-sm font-semibold text-emerald-400">Responsable</div><p class="text-xs text-neutral-400 mt-1">desde el primer día</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔁</div><div class="text-sm font-semibold text-emerald-400">Vuelve siempre</div><p class="text-xs text-neutral-400 mt-1">en todas las rutas</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Marcar como leído</span>
+</button>
+</div>
+</section>
+<!-- ===================== RESUMO ===================== -->
+<section class="mb-12">
+<div class="bg-gradient-to-br from-emerald-900/40 via-dark-800 to-dark-800 rounded-xl border border-emerald-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">🎓</span> Resumen del módulo</h2>
+<div class="space-y-4 mb-8">
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">La misma fuerza sirve para ambos lados</strong><span class="text-neutral-400"> — los límites determinan quién decide de qué lado.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Conectar fue fácil; controlar, no</strong><span class="text-neutral-400"> — modelos, herramientas y conectores de un clic.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Empleado nuevo</strong><span class="text-neutral-400"> — acceso gradual; el dinero, la eliminación y la publicación siempre requieren aprobación.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Señales de un agente sin control</strong><span class="text-neutral-400"> — acceso a todo, sin registro, sin responsable; nadie sabe cómo desactivarlo.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-emerald-400 mt-1">✓</span><div><strong class="text-neutral-100">Tarjeta «Mi agente» completada</strong><span class="text-neutral-400"> — vuelve en todas las rutas.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-emerald-400 mb-2">Siguiente ruta:</h3>
+<p class="text-neutral-300">Ruta 2 — Encontrar el problema · empieza por el módulo 2.1, La pregunta del 10×</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Volver a la ruta</a>
+<a class="flex-1 text-center px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-500 transition-colors" href="../trilha2/index.html">Siguiente ruta: Encontrar el dolor →</a>
+</div>
+</div>
+</section>
+</main>
+<aside class="hidden lg:block">
+<nav aria-label="Índice de la página" class="sticky top-24" data-inema-toc="">
+<p class="text-sm text-neutral-400 mb-3"><span data-inema-section-counter="">Sección 1 de 6</span></p>
+<ol class="space-y-2 text-sm">
+<li><a class="text-neutral-400 hover:text-emerald-400" href="#topico-1">1. Dos lados</a></li>
+<li><a class="text-neutral-400 hover:text-emerald-400" href="#topico-2">2. Por qué ahora</a></li>
+<li><a class="text-neutral-400 hover:text-emerald-400" href="#topico-3">3. Empleado nuevo</a></li>
+<li><a class="text-neutral-400 hover:text-emerald-400" href="#topico-4">4. Señales de alerta</a></li>
+<li><a class="text-neutral-400 hover:text-emerald-400" href="#topico-5">5. ¿Y si sale mal?</a></li>
+<li><a class="text-neutral-400 hover:text-emerald-400" href="#topico-6">6. Mi agente</a></li>
+</ol>
+</nav>
+</aside>
+</div>
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>Agente bajo Control · 2026 | <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> - <a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200" href="https://inema.pro" target="_blank">PRO</a></p>
+</div>
+</footer>
+<script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const _html = document.documentElement;
+    if (!_html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); }
+    else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      if (window.INEMA && INEMA.setPref) { INEMA.setPref('theme', _html.classList.contains('dark') ? 'claro' : 'inema-dark'); }
+      else { _html.classList.toggle('dark'); }
+      themeToggleDarkIcon.classList.toggle('hidden', _html.classList.contains('dark'));
+      themeToggleLightIcon.classList.toggle('hidden', !_html.classList.contains('dark'));
+      try { localStorage.setItem('theme', _html.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
+    });
+    function toggleTopic(button) {
+      const item = button.closest('.topic-item');
+      const exp = item.querySelector('.topic-explanation');
+      const card = button.closest('[id^="modulo-"]') || document;
+      card.querySelectorAll('.topic-explanation.active').forEach(e => { if (e !== exp) { e.classList.remove('active'); const b = e.parentElement.querySelector('[aria-controls]'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+      exp.classList.toggle('active');
+      button.setAttribute('aria-expanded', exp.classList.contains('active') ? 'true' : 'false');
+    }
+    let _lastModalTrigger = null;
+    function openModal(id){ const m=document.getElementById(id); if(m){ _lastModalTrigger=document.activeElement; m.classList.remove('hidden'); document.body.style.overflow='hidden'; const c=m.querySelector('button'); if(c) c.focus(); } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; if(_lastModalTrigger){ _lastModalTrigger.focus(); _lastModalTrigger=null; } }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.INEMA && INEMA.registerCheck) {
+        INEMA.registerCheck('modulo-1-2#q1', { answer: 1, explain: {
+          '0': 'Rapidez não é o problema. O risco está em ele agir sem ninguém ver e sem deixar rastro.',
+          '1': 'Isso. Envia sem mostrar antes e não deixa registro: se errar, ninguém vê nem consegue descobrir o que aconteceu.',
+          '2': 'Só uma pessoa saber desligar é pouco: e se a Júlia estiver de folga? Além disso, sem histórico, ninguém sabe o que ele fez.'
+        } });
+      }
+    });
+  </script>
+</body>
+</html>

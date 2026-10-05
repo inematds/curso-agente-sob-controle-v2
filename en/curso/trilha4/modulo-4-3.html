@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="agscv2" name="inema-course"/>
+<title>Spending, isolation, and LGPD | Agent Under Control</title>
+<!-- ANTI-FOUC: bloqueante, ANTES do Tailwind -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; }
+        } else {
+          var legacy = localStorage.getItem('theme');
+          if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark';
+        }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = {
+        'inema-dark': { dark: true,  attr: null,        cs: 'dark'  },
+        'claro':      { dark: false, attr: null,        cs: 'light' },
+        'sepia':      { dark: false, attr: 'sepia',     cs: 'light' },
+        'foco':       { dark: null,  attr: 'foco',      cs: null    },
+        'contraste':  { dark: true,  attr: 'contraste', cs: 'dark'  }
+      };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+      html.setAttribute('data-font', p.font || 'inter');
+      html.setAttribute('data-accent', p.accent || 'emerald');
+      var s = html.style; var scale = (+p.fontScale || 100);
+      s.setProperty('--inema-font-scale', (scale / 100).toString());
+      s.setProperty('font-size', scale + '%');
+      s.setProperty('--measure', (+p.lineWidth || 68) + 'ch');
+      s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+      var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+        : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC = { emerald: [152,76,45], blue: [217,91,60], purple: [258,90,66], amber: [38,92,50], teal: [174,72,41], rose: [350,89,60] };
+      var a = ACC[p.accent] || ACC.emerald;
+      s.setProperty('--accent-h', a[0]+''); s.setProperty('--accent-s', a[1]+'%'); s.setProperty('--accent-l', a[2]+'%');
+      s.setProperty('--accent', 'hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch(e){} }
+  })();
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: {
+      primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<!-- Manifesto do curso (OBRIGATORIO em TODA pagina, identico) -->
+<script data-inema-manifest="" type="application/json">
+  {"course":"agscv2","tracks":[{"n":"1","title":"Por que agora","modules":[{"id":"1-1","title":"Responder não é agir","topics":6,"href":"curso/trilha1/modulo-1-1.html"},{"id":"1-2","title":"Mais capaz, mais limites","topics":6,"href":"curso/trilha1/modulo-1-2.html"}]},{"n":"2","title":"Achar a dor","modules":[{"id":"2-1","title":"A pergunta do 10×","topics":6,"href":"curso/trilha2/modulo-2-1.html"},{"id":"2-2","title":"Pedido não é problema","topics":6,"href":"curso/trilha2/modulo-2-2.html"}]},{"n":"3","title":"Controlar o sistema","modules":[{"id":"3-1","title":"As cinco chaves","topics":6,"href":"curso/trilha3/modulo-3-1.html"},{"id":"3-2","title":"Três regras e casos reais","topics":6,"href":"curso/trilha3/modulo-3-2.html"}]},{"n":"4","title":"O que quase ninguém conta","modules":[{"id":"4-1","title":"Ordens escondidas","topics":6,"href":"curso/trilha4/modulo-4-1.html"},{"id":"4-2","title":"Senhas e extensões","topics":6,"href":"curso/trilha4/modulo-4-2.html"},{"id":"4-3","title":"Gasto, isolamento e LGPD","topics":6,"href":"curso/trilha4/modulo-4-3.html"}]},{"n":"5","title":"Assumir o resultado","modules":[{"id":"5-1","title":"Métrica com dono","topics":6,"href":"curso/trilha5/modulo-5-1.html"},{"id":"5-2","title":"A planilha em 4 blocos","topics":6,"href":"curso/trilha5/modulo-5-2.html"}]}]}
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-200 { color: #1f2937; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #6b7280; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+
+    /* Light mode - acentos das 5 trilhas (emerald, blue, purple, amber, teal) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(217, 119, 6, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(217, 119, 6, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(217, 119, 6, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(217, 119, 6, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+    html:not(.dark) .text-teal-400 { color: #0d9488; }
+    html:not(.dark) .bg-teal-500\/20 { background-color: rgba(13, 148, 136, 0.12); }
+    html:not(.dark) .bg-teal-500\/10 { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .bg-teal-900\/20 { background-color: rgba(13, 148, 136, 0.07); }
+    html:not(.dark) .border-teal-500\/30 { border-color: rgba(13, 148, 136, 0.25); }
+    html:not(.dark) .hover\:bg-teal-500\/30:hover { background-color: rgba(13, 148, 136, 0.18); }
+    html:not(.dark) .hover\:text-teal-400:hover { color: #0d9488; }
+    html:not(.dark) .hover\:bg-teal-500\/10:hover { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-teal-400 { color: #0d9488; }
+
+    /* Light mode - remove gradientes e cores especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/40 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.22); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.06); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+
+    /* Light mode - nav */
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* Alvos de ancora abaixo do nav sticky */
+    [data-inema-topic], [id^="modulo-"], [id^="topico-"] { scroll-margin-top: 72px; }
+
+    /* SVG light mode + animacao */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-dash { to { stroke-dashoffset: -24; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+      .wf-flow { stroke-dasharray: 6 6; animation: wf-dash 1.2s linear infinite; }
+    }
+
+    /* Topicos expansiveis */
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+  </style>
+<link href="https://inematds.github.io/curso-agente-sob-controle-v2/curso/trilha4/modulo-4-3.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/en/curso/trilha4/modulo-4-3.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/es/curso/trilha4/modulo-4-3.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha4/modulo-4-3.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="modulo-4-3.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">EN</a><a href="../../../es/curso/trilha4/modulo-4-3.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-black focus:rounded-lg" href="#conteudo">Skip to content</a>
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-3">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🛡️</span>
+<span class="font-bold text-lg hidden lg:inline">Agent under Control</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+<span class="text-neutral-600">-</span>
+<a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200 text-sm font-medium" href="https://inema.pro" target="_blank">PRO</a>
+</div>
+<div class="flex items-center space-x-1">
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html">
+<span class="xl:hidden">T1</span><span class="hidden xl:inline">Why now</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="xl:hidden">T2</span><span class="hidden xl:inline">Find the pain point</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="xl:hidden">T3</span><span class="hidden xl:inline">Control</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-amber-400 bg-amber-500/10" href="index.html">
+<span class="xl:hidden">T4</span><span class="hidden xl:inline">Hidden risks</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-teal-400 hover:bg-teal-500/10 transition-colors" href="../trilha5/index.html">
+<span class="xl:hidden">T5</span><span class="hidden xl:inline">Result</span>
+</a>
+<button class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-journey-open="" title="My journey" type="button">
+<span aria-hidden="true">◷</span><span class="hidden md:inline">Journey</span>
+<span class="inema-journey-badge" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<div class="relative">
+<button aria-controls="aparencia" aria-expanded="false" class="p-2 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-appearance-toggle="#aparencia" title="Appearance" type="button">
+<span aria-hidden="true" class="text-sm font-semibold">Aa</span><span class="sr-only">Appearance</span>
+</button>
+<div class="inema-appearance-pop" data-inema-appearance="" id="aparencia">
+<div aria-label="Topic" class="inema-segment">
+<button data-inema-set-theme="inema-dark" type="button">Dark</button>
+<button data-inema-set-theme="claro" type="button">Clear</button>
+<button data-inema-set-theme="sepia" type="button">Sepia</button>
+<button data-inema-set-theme="foco" type="button">Focus</button>
+<button data-inema-set-theme="contraste" type="button">High contrast</button>
+</div>
+<div aria-label="Source" class="inema-segment">
+<button data-inema-set-font="inter" type="button">Inter</button>
+<button data-inema-set-font="system" type="button">System</button>
+<button data-inema-set-font="leitura" type="button">Reading</button>
+</div>
+<div aria-label="Text length" class="inema-segment">
+<button data-inema-set-fontscale="100" type="button">A</button>
+<button data-inema-set-fontscale="112" type="button">A+</button>
+<button data-inema-set-fontscale="125" type="button">A++</button>
+</div>
+<div aria-label="Line width" class="inema-segment">
+<button data-inema-set-linewidth="60" type="button">Narrow</button>
+<button data-inema-set-linewidth="68" type="button">Medium</button>
+<button data-inema-set-linewidth="75" type="button">Wide</button>
+</div>
+<div aria-label="Subtext" class="inema-segment">
+<button data-inema-set-leading="1.45" type="button">Compact</button>
+<button data-inema-set-leading="1.7" type="button">Comfortable</button>
+</div>
+</div>
+</div>
+<button aria-label="Toggle light/dark theme" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<nav aria-label="Navigation track" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-amber-400" href="../../index.html">Start</a><span>/</span>
+<a class="hover:text-amber-400" href="index.html">Track 4</a><span>/</span>
+<span class="text-amber-400">Module 4.3</span>
+</div>
+</nav>
+<header class="bg-gradient-to-br from-amber-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="4-3" data-inema-track="4">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4">MODULE 4.3</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">💸 Spending, isolation, and LGPD</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">A limit on spending, a limit on effort, a fenced area for the agent to work in, and only the minimum customer data. The last gates that almost nobody closes.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-amber-400">6</div><div class="text-xs text-neutral-400">Topics</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-amber-400">~35</div><div class="text-xs text-neutral-400">Minutes</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-amber-400">Practical</div><div class="text-xs text-neutral-400">Level</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-amber-400">Defense</div><div class="text-xs text-neutral-400">Type</div></div>
+</div>
+<div aria-label="Module 4.3 progress" aria-valuemax="100" aria-valuemin="0" class="mt-6 max-w-2xl" data-inema-meter="modulo:4-3" role="progressbar">
+<div class="flex justify-between text-xs text-neutral-400 mb-1"><span data-inema-meter-frac="">0 of 6</span><span data-inema-meter-pct="">0%</span></div>
+<div class="inema-bar"><div class="inema-bar__fill" data-inema-meter-fill=""></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[1fr_220px] lg:gap-10">
+<main class="min-w-0" data-inema-module="4-3" data-inema-track="4" id="conteudo">
+<!-- ===================== TOPICO 1 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-4-3#topico-1" id="topico-1">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xl">1</span>
+<h2 class="text-2xl font-bold flex-1">Set a spending cap</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m4-3-t1-p1">Many AI services charge by usage: each question, each agent turn, each file it reads costs a little credit. An agent working on its own can make hundreds of turns in one night.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m4-3-t1-p2">Without a cap, you find out how much you spent when the bill arrives. <strong class="text-amber-400">With a cap, you know the worst case before it happens.</strong></p>
+<div class="rounded-2xl border border-amber-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Chart of spending over the course of one night. The red line, with no cap, keeps rising until it goes off the chart. The amber line, with a cap, rises the same way until it reaches the dashed line marking the monthly limit, then stays flat. A bell marks the usage alert halfway to the cap." class="w-full h-auto" role="img" viewbox="0 0 800 260">
+<defs>
+<pattern height="32" id="m43-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#fbbf24" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m43-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+</defs>
+<rect fill="url(#m43-grid)" height="260" width="800" x="0" y="0"></rect>
+<line stroke="#4b5563" stroke-width="2" x1="80" x2="760" y1="220" y2="220"></line>
+<line stroke="#4b5563" stroke-width="2" x1="80" x2="80" y1="220" y2="30"></line>
+<g fill="#9ca3af" font-family="Inter,sans-serif" font-size="11">
+<text text-anchor="middle" x="80" y="240">22h</text><text text-anchor="middle" x="300" y="240">1h</text><text text-anchor="middle" x="530" y="240">4h</text><text text-anchor="middle" x="760" y="240">7h</text>
+<text text-anchor="end" transform="rotate(-90 40 36)" x="40" y="36">expense</text>
+</g>
+<line stroke="#fbbf24" stroke-dasharray="6 6" stroke-width="2" x1="80" x2="760" y1="100" y2="100"></line>
+<text fill="#fde68a" font-family="Inter,sans-serif" font-size="12" text-anchor="end" x="755" y="92">monthly cap</text>
+<line stroke="#38bdf8" stroke-dasharray="2 6" stroke-width="1" x1="80" x2="760" y1="160" y2="160"></line>
+<text fill="#bae6fd" font-family="Inter,sans-serif" font-size="11" text-anchor="end" x="755" y="154">alert at 50%</text>
+<path class="wf-flow" d="M80,215 C 200,210 280,190 360,150 S 480,60 560,20" fill="none" stroke="#f87171" stroke-width="3"></path>
+<text fill="#fca5a5" font-family="Inter,sans-serif" font-size="12" x="570" y="30">no cap: it keeps rising until someone notices</text>
+<g filter="url(#m43-glow)"><path d="M80,215 C 200,210 280,190 330,160 S 400,110 430,100 L 760,100" fill="none" stroke="#fbbf24" stroke-width="3"></path></g>
+<circle cx="330" cy="160" fill="#0b1f2e" r="12" stroke="#38bdf8" stroke-width="2"></circle>
+<text font-size="12" text-anchor="middle" x="330" y="165">🔔</text>
+<text fill="#fbbf24" font-family="Inter,sans-serif" font-size="12" font-weight="600" text-anchor="middle" x="600" y="126">with a cap: stops at the limit</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> the two lines start out the same—the same agent is stuck repeating the task. The blue bell is the email alert at halfway to the limit: time to take a look. The amber line stays flat at the dashed line because the account stops accepting charges; the red one only stops when someone wakes up.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ No ceiling</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>AI account linked to the main credit card, with no monthly limit.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>No usage alerts configured.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Marcos left an agent checking documents overnight; a faulty file made it try again, and again.</span></li>
+</ul>
+</div>
+<div class="bg-amber-900/20 rounded-xl border border-amber-500/30 p-6">
+<h4 class="font-bold text-amber-400 mb-4">✓ With a limit</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-amber-400">✓</span><span>Monthly limit set in the account dashboard ("spending limit," "budget").</span></li>
+<li class="flex items-start space-x-2"><span class="text-amber-400">✓</span><span>Email alert at 50% and 80% of the limit.</span></li>
+<li class="flex items-start space-x-2"><span class="text-amber-400">✓</span><span>A virtual card just for AI, with a low limit. Marcos's loss stopped there.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Can’t find where to set a limit?</h3>
+<p class="text-neutral-300 text-sm">Use a fixed monthly plan or create a virtual card in your bank's app just for AI services, with a limit of, for example, twice what you expect to spend. This solves the same problem without relying on the service dashboard.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🧢</div><div class="text-sm font-semibold text-amber-400">Spending limit</div><p class="text-xs text-neutral-400 mt-1">monthly limit</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔔</div><div class="text-sm font-semibold text-amber-400">Alert</div><p class="text-xs text-neutral-400 mt-1">at 50% and 80%</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💳</div><div class="text-sm font-semibold text-amber-400">Virtual card</div><p class="text-xs text-neutral-400 mt-1">only for AI</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📉</div><div class="text-sm font-semibold text-amber-400">Worst case</div><p class="text-xs text-neutral-400 mt-1">known in advance</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 2 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-4-3#topico-2" id="topico-2">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xl">2</span>
+<h2 class="text-2xl font-bold flex-1">Set a resource cap and stop the loop</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m4-3-t2-p1">Money isn’t the only thing an agent uses up. It uses time, attempts, sent messages, and computer memory. A <strong class="text-amber-400">loop</strong> without an end, it consumes all of this at the same time.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m4-3-t2-p2">It happened on one of our projects: a tool running without a memory limit froze the entire server—and without a ceiling, it froze again on the next attempt. The fix was one line: a limit. Every agent needs its own.</p>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-amber-400"><tr><th class="px-4 py-3 font-semibold">Limit</th><th class="px-4 py-3 font-semibold">Example for Renata’s clinic</th><th class="px-4 py-3 font-semibold">When it hits the limit…</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">⏱️ Maximum time</td><td class="px-4 py-3 text-neutral-300">confirming the appointment takes no more than 10 minutes</td><td class="px-4 py-3 text-neutral-300">stops and tells you what's missing</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🔁 Attempts</td><td class="px-4 py-3 text-neutral-300">no more than 3 attempts per patient</td><td class="px-4 py-3 text-neutral-300">mark it "not confirmed" and move on</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">✉ Sends</td><td class="px-4 py-3 text-neutral-300">no more than 40 messages per day</td><td class="px-4 py-3 text-neutral-300">stops everything and asks for approval</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">💾 Memory / machine</td><td class="px-4 py-3 text-neutral-300">limit set by whoever installed it</td><td class="px-4 py-3 text-neutral-300">the system stops only the agent, not the server</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">What to look for in the table:</strong> the last column. A good limit doesn’t just stop the agent: it says what to do when it stops—notify you, mark the task as pending, ask for approval. Stopping silently is almost as bad as not stopping.</p>
+<div class="bg-dark-800 rounded-xl border border-amber-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-amber-900/20 border-b border-amber-500/30"><span class="text-amber-400 font-semibold text-sm">🎯 Goal: give the agent written effort limits</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Paste into the agent's fixed instructions. Adjust the numbers inside &lt; &gt; for your task.</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">REGRA: LIMITES DE ESFORÇO
+1. Cada tarefa tem no máximo &lt;10&gt; minutos. Passou disso, pare e me diga o que concluiu e o que falta.
+2. Se uma mesma ação falhar &lt;3&gt; vezes seguidas, não tente de novo. Registre o erro e me avise.
+3. Nunca envie mais de &lt;40&gt; mensagens por dia. Chegou no limite, pare e peça aprovação.
+4. Se perceber que está repetindo os mesmos passos sem avançar, pare. Repetição sem progresso é sinal de loop.
+5. Ao parar por qualquer limite, escreva: qual limite, onde parou e o que sugere.</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-amber-400">How to verify:</strong> ask the agent to deliberately do an impossible task (e.g., "confirm the appointment of a patient who isn't on the calendar"). The expected behavior is for it to try a few times, stop, and explain which limit it reached.</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🌀</div><div class="text-sm font-semibold text-amber-400">Loop</div><p class="text-xs text-neutral-400 mt-1">repeat without making progress</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏱️</div><div class="text-sm font-semibold text-amber-400">Maximum time</div><p class="text-xs text-neutral-400 mt-1">per task</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">3️⃣</div><div class="text-sm font-semibold text-amber-400">Attempts</div><p class="text-xs text-neutral-400 mt-1">few and limited</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🗣️</div><div class="text-sm font-semibold text-amber-400">Stop with a notification</div><p class="text-xs text-neutral-400 mt-1">never silent</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 3 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-4-3#topico-3" id="topico-3">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xl">3</span>
+<h2 class="text-2xl font-bold flex-1">Isolate the agent</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m4-3-t3-p1">Limiting what the agent can do is one part. The other is limiting <strong class="text-amber-400">where</strong> it can do. An isolated agent works in a walled-off space: if it makes a mistake or is tricked, the damage stays inside.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m4-3-t3-p2">You don’t have to set this up alone. You need to know what to ask: "Does the agent run in isolation? In which folder? What’s excluded?".</p>
+<div class="bg-amber-900/20 rounded-xl border border-amber-500/30 p-6 mb-6">
+<h3 class="text-base font-semibold text-amber-400 mb-2 flex items-center"><span class="mr-2">🆕</span> New here? What is a “sandbox”?</h3>
+<p class="text-neutral-300 text-sm"><strong>Sandbox</strong> (in English, <em>sandbox</em>) is a closed-off space where the agent can make changes freely without reaching the rest of the computer — like a sandbox where a child can play without making a mess in the house. A common way to set this up is called <strong>container</strong> (<em>container</em>): a "box" with only the files and programs the agent needs. The simplest version is a <strong>limited folder</strong>: the agent can see only one folder, and nothing outside it.</p>
+</div>
+<div class="rounded-2xl border border-amber-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="A rectangular enclosure in the center with the agent and only two items inside: the work folder and the scheduling spreadsheet. Outside the enclosure are personal email, the bank, the key file, and family photos. An arrow showing the agent trying to leave hits the fence and stops." class="w-full h-auto" role="img" viewbox="0 0 800 260">
+<defs>
+<pattern height="32" id="m43b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#fbbf24" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m43b-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m43b-arrow" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m43b-grid)" height="260" width="800" x="0" y="0"></rect>
+<g filter="url(#m43b-glow)"><rect fill="#2a1d06" height="180" rx="18" stroke="#fbbf24" stroke-dasharray="10 6" stroke-width="3" width="340" x="230" y="40"></rect></g>
+<text fill="#fbbf24" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="400" y="64">sandbox</text>
+<rect fill="#1f2937" height="46" rx="12" stroke="#fde68a" stroke-width="2" width="110" x="345" y="85"></rect>
+<text fill="#fde68a" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="400" y="113">agent</text>
+<g font-family="Inter,sans-serif" font-size="12">
+<rect class="wf-a" fill="#0b1f2e" height="40" rx="9" stroke="#38bdf8" stroke-width="2" width="140" x="255" y="155"></rect>
+<text fill="#bae6fd" text-anchor="middle" x="325" y="180">📁 working folder</text>
+<rect class="wf-a" fill="#0b1f2e" height="40" rx="9" stroke="#38bdf8" stroke-width="2" width="145" x="405" y="155"></rect>
+<text fill="#bae6fd" text-anchor="middle" x="477" y="180">📅 calendar (copy)</text>
+</g>
+<line marker-end="url(#m43b-arrow)" stroke="#38bdf8" stroke-width="2" x1="370" x2="330" y1="133" y2="152"></line>
+<line marker-end="url(#m43b-arrow)" stroke="#38bdf8" stroke-width="2" x1="430" x2="470" y1="133" y2="152"></line>
+<g fill="#9ca3af" font-family="Inter,sans-serif" font-size="12">
+<rect fill="#111827" height="38" rx="9" stroke="#4b5563" width="160" x="30" y="50"></rect><text text-anchor="middle" x="110" y="74">✉ personal email</text>
+<rect fill="#111827" height="38" rx="9" stroke="#4b5563" width="160" x="30" y="170"></rect><text text-anchor="middle" x="110" y="194">🏦 bank</text>
+<rect fill="#111827" height="38" rx="9" stroke="#4b5563" width="160" x="610" y="50"></rect><text text-anchor="middle" x="690" y="74">🔑 key file</text>
+<rect fill="#111827" height="38" rx="9" stroke="#4b5563" width="160" x="610" y="170"></rect><text text-anchor="middle" x="690" y="194">🖼️ family photos</text>
+</g>
+<line class="wf-flow" stroke="#f87171" stroke-width="2" x1="457" x2="565" y1="100" y2="80"></line>
+<text fill="#fca5a5" font-family="Inter,sans-serif" font-size="16" font-weight="700" text-anchor="middle" x="585" y="36">✕</text>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="400" y="246">if it is deceived, the damage stays inside the fence</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> The dashed amber fence is the agent’s limit. Inside is only what the task requires—notice that the schedule is a <em>copy</em>. The red line shows the agent trying to reach the key file: it hits the fence. The four gray boxes outside are on the same computer, but the agent can’t see them.</p>
+<div class="space-y-5 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center"><span class="text-amber-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Basic level: separate account and folder</h4><p class="text-neutral-300 text-sm">The agent uses an email account of its own and can see only one folder. Anyone can do this.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center"><span class="text-amber-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Intermediate level: separate computer or user account</h4><p class="text-neutral-300 text-sm">A system user account just for the agent, or an old dedicated machine, with no login to the bank or your personal accounts.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center"><span class="text-amber-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Technical level: container</h4><p class="text-neutral-300 text-sm">Set up by whoever installs it. You ask and check: "what's included?", "what's excluded?", "who turns it off?".</p></div>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🏖️</div><div class="text-sm font-semibold text-amber-400">Sandbox</div><p class="text-xs text-neutral-400 mt-1">walled-off space</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📦</div><div class="text-sm font-semibold text-amber-400">Container</div><p class="text-xs text-neutral-400 mt-1">box with the minimum</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📁</div><div class="text-sm font-semibold text-amber-400">Restricted folder</div><p class="text-xs text-neutral-400 mt-1">the simplest isolation</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📋</div><div class="text-sm font-semibold text-amber-400">Copy</div><p class="text-xs text-neutral-400 mt-1">instead of the original</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 4 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-4-3#topico-4" id="topico-4">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xl">4</span>
+<h2 class="text-2xl font-bold flex-1">Understand the LGPD in one page</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m4-3-t4-p1">The LGPD (General Data Protection Law) explains how a company can use people’s data. It applies equally whether a customer spreadsheet is read by an employee or an AI agent. <strong class="text-amber-400">You’re still responsible.</strong></p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m4-3-t4-p2">This is not legal advice. It’s the minimum a business owner needs to keep in mind before connecting an agent to customer data.</p>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-amber-400"><tr><th class="px-4 py-3 font-semibold">The idea behind the law</th><th class="px-4 py-3 font-semibold">In plain language</th><th class="px-4 py-3 font-semibold">In practice, with the agent</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Personal data</td><td class="px-4 py-3 text-neutral-300">everything that identifies someone: name, phone number, CPF, email</td><td class="px-4 py-3 text-neutral-300">Renata’s entire schedule is personal data</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Sensitive data</td><td class="px-4 py-3 text-neutral-300">health, religion, biometrics, racial origin, among others — extra care required</td><td class="px-4 py-3 text-neutral-300">"had this procedure" is health data</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Legal basis</td><td class="px-4 py-3 text-neutral-300">an accepted reason to use the data: consent, contract, legal obligation…</td><td class="px-4 py-3 text-neutral-300">a reminder about a scheduled appointment fits into service; sending a promotion requires consent</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Purpose</td><td class="px-4 py-3 text-neutral-300">use only for what was agreed</td><td class="px-4 py-3 text-neutral-300">a phone number given to confirm an appointment doesn’t become a marketing list</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Need</td><td class="px-4 py-3 text-neutral-300">use as little as possible</td><td class="px-4 py-3 text-neutral-300">the reminder agent doesn’t need the CPF (topic 5)</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">Data subject rights</td><td class="px-4 py-3 text-neutral-300">the person can ask to see, correct, or delete their data</td><td class="px-4 py-3 text-neutral-300">you need to know where the agent stored copies</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">What to look for in the table:</strong> the right-hand column. Almost every safeguard comes down to a simple question: "Why does the agent need this?" and "Where does it store it?" If you can’t answer, it’s not time to turn it on yet.</p>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-2 flex items-center"><span class="mr-2">⚠️</span> Attention: health is sensitive data</h3>
+<p class="text-neutral-300 text-sm">Clinics, medical offices, gyms, and salons that record allergies or treatments handle sensitive data. Pasting that history into any AI chat "just to summarize it" is the kind of carelessness the law penalizes. When in doubt, talk to whoever handles the legal side of your business before turning on the agent.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🪪</div><div class="text-sm font-semibold text-amber-400">Personal data</div><p class="text-xs text-neutral-400 mt-1">identifies someone</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🩺</div><div class="text-sm font-semibold text-amber-400">Sensitive data</div><p class="text-xs text-neutral-400 mt-1">health and related matters</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📜</div><div class="text-sm font-semibold text-amber-400">Legal basis</div><p class="text-xs text-neutral-400 mt-1">accepted reason</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🎯</div><div class="text-sm font-semibold text-amber-400">Purpose</div><p class="text-xs text-neutral-400 mt-1">only what was agreed</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 5 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-4-3#topico-5" id="topico-5">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xl">5</span>
+<h2 class="text-2xl font-bold flex-1">Show the agent only what it needs</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m4-3-t5-p1">Two techniques solve most of it: <strong class="text-amber-400">minimize</strong> (remove the columns the task doesn't use) and <strong class="text-amber-400">anonymize</strong> (replace the name with a code). The agent does the same work; anything leaked is worth much less.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m4-3-t5-p2">Do this <em>before</em> before the data reaches the agent, in your spreadsheet. Asking the AI to "anonymize" data you already pasted into the chat won’t help: they’re already there.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ What Renata was going to send</h4>
+<pre class="font-mono text-xs text-neutral-300 whitespace-pre-wrap">Nome: Ana Paula Souza
+CPF: 000.000.000-00
+Telefone: (00) 90000-0000
+Procedimento: peeling químico
+Alergia: ácido salicílico
+Faltou: 3 vezes</pre>
+</div>
+<div class="bg-amber-900/20 rounded-xl border border-amber-500/30 p-6">
+<h4 class="font-bold text-amber-400 mb-4">✓ What she sent</h4>
+<pre class="font-mono text-xs text-neutral-300 whitespace-pre-wrap">Código: P-014
+Tipo de sessão: facial
+Faltou: 3 vezes</pre>
+<p class="text-xs text-neutral-400 mt-3">The question was “which patients miss appointments most often?” The code is enough to answer it. Only she has the table that links P-014 to a name.</p>
+</div>
+</div>
+<div class="bg-dark-800 rounded-xl border border-amber-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-amber-900/20 border-b border-amber-500/30"><span class="text-amber-400 font-semibold text-sm">🎯 Goal: decide, column by column, what the agent can see</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Paste into the AI chat. Send <strong>only the column names</strong> from your spreadsheet — never the data. Replace what’s between &lt; &gt;.</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">Vou ligar um agente de IA a uma planilha de clientes e quero dar a ele o mínimo de dados.
+Tarefa do agente: &lt;ex.: identificar quem mais falta às consultas e sugerir horários de lembrete&gt;.
+Colunas da planilha (só os nomes, sem dados): &lt;ex.: nome, CPF, telefone, e-mail, data de nascimento, procedimento, alergias, faltas, valor pago&gt;.
+
+Para cada coluna, responda em uma tabela:
+coluna | a tarefa precisa? (sim/não) | se sim, dá para trocar por código ou faixa? | é dado sensível pela LGPD?
+Depois, me diga qual seria a planilha mínima para essa tarefa.</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-amber-400">How to verify:</strong> The minimal spreadsheet should have less than half the original columns and no health, ID, or contact columns—unless the task is specifically to contact someone. In that case, keep the phone number and remove the rest.</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">✂️</div><div class="text-sm font-semibold text-amber-400">Minimize</div><p class="text-xs text-neutral-400 mt-1">only the useful columns</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔢</div><div class="text-sm font-semibold text-amber-400">Anonymize</div><p class="text-xs text-neutral-400 mt-1">name becomes code</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🗝️</div><div class="text-sm font-semibold text-amber-400">Key table</div><p class="text-xs text-neutral-400 mt-1">stays with you</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏮️</div><div class="text-sm font-semibold text-amber-400">Before</div><p class="text-xs text-neutral-400 mt-1">in the spreadsheet, not in chat</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 6 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-4-3#topico-6" id="topico-6">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xl">6</span>
+<h2 class="text-2xl font-bold flex-1">Close the four doors</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m4-3-t6-p1">Most problems with agents don’t come from a sophisticated attack. They come from <strong class="text-amber-400">four doors open</strong>: a secret in chat, an extension accepted without reading, an account without a limit, and too much customer data.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m4-3-t6-p2">This checklist brings together what you saw in modules 4.2 and 4.3. Go through it for the agent you chose at the beginning of the course—it goes straight to the “security” section of the Trail 5 spreadsheet.</p>
+<div class="bg-dark-800 rounded-xl border border-amber-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-amber-900/20 border-b border-amber-500/30"><span class="text-amber-400 font-semibold text-sm">🎯 Goal: leave with all four gates checked for your agent</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Copy this into a document. Mark [x] for what's already done and write the expected date for anything that's left.</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">AS QUATRO PORTAS — agente: &lt;nome/tarefa do seu agente&gt;   data: &lt;____&gt;
+
+PORTA 1 · SEGREDOS
+[ ] Nenhuma senha, chave ou token colado em chat ou documento compartilhado.
+[ ] Regra "segredos" nas instruções do agente (módulo 4.2).
+[ ] Sei onde revogar cada chave: &lt;lista&gt;.
+
+PORTA 2 · EXTENSÕES
+[ ] Revisei extensões, plugins e apps conectados; removi o que não uso.
+[ ] Cada um que ficou: sei quem publicou e o que pede combina com o que faz.
+
+PORTA 3 · GASTO E ESFORÇO
+[ ] Teto mensal na conta: R$ &lt;____&gt;. Alerta em 50%: [ ]
+[ ] Cartão só para IA ou plano fixo: [ ]
+[ ] Regra "limites de esforço" nas instruções (tempo, tentativas, envios).
+[ ] O agente roda isolado: pasta/conta/contêiner &lt;qual&gt;.
+
+PORTA 4 · DADOS DE CLIENTES
+[ ] O agente toca dados de clientes? &lt;sim/não&gt;. Dado sensível? &lt;sim/não&gt;
+[ ] Planilha mínima: só as colunas que a tarefa usa; nomes trocados por código quando der.
+[ ] Sei onde o agente guarda cópias, para atender quem pedir para apagar.
+
+Porta que ainda está aberta: &lt;____&gt;. Quem fecha: &lt;____&gt;. Até: &lt;____&gt;.</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-amber-400">How to verify:</strong> no blank lines. An item without [x] is acceptable if it has an owner and a date on the last line. A gate with no [x] means the agent should not be turned on yet.</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> How Marcos used it</h3>
+<p class="text-neutral-300 text-sm">Marcos went through the checklist with Júlia, the office assistant, on a Friday afternoon. It took 25 minutes. They found two open doors: an AI account with no spending cap and a spreadsheet containing every client’s CPF that the agent didn’t even use. They closed both before leaving.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-6 mb-6" data-inema-check="modulo-4-3#q1">
+<p class="font-medium mb-4">Quick test (optional): Renata wants an agent to find out which patients miss the most appointments. What should she give it?</p>
+<div class="space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">The complete spreadsheet, with names, CPF numbers, phone numbers, and procedure history.</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">Only each patient’s code and number of absences, with the name table kept by her.</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">The complete spreadsheet, asking the agent to delete the data afterward.</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🗝️</div><div class="text-sm font-semibold text-amber-400">Secrets</div><p class="text-xs text-neutral-400 mt-1">outside the chat</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🧩</div><div class="text-sm font-semibold text-amber-400">Extensions</div><p class="text-xs text-neutral-400 mt-1">only the verified ones</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💸</div><div class="text-sm font-semibold text-amber-400">Ad spend</div><p class="text-xs text-neutral-400 mt-1">with a cap and guardrails</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">👥</div><div class="text-sm font-semibold text-amber-400">Customer data</div><p class="text-xs text-neutral-400 mt-1">only the minimum</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== RESUMO ===================== -->
+<section class="mb-12">
+<div class="bg-gradient-to-br from-amber-900/40 via-dark-800 to-dark-800 rounded-xl border border-amber-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">🎓</span> Module summary</h2>
+<div class="space-y-4 mb-8">
+<div class="flex items-start space-x-3"><span class="text-amber-400 mt-1">✓</span><div><strong class="text-neutral-100">Every expense has a cap</strong><span class="text-neutral-400"> — limit, alert, and a card just for AI.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-amber-400 mt-1">✓</span><div><strong class="text-neutral-100">Every effort has a cap</strong><span class="text-neutral-400"> — time, attempts, and sends; stop with a notification.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-amber-400 mt-1">✓</span><div><strong class="text-neutral-100">An isolated agent makes mistakes within the fence</strong><span class="text-neutral-400"> — folder, account, or container.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-amber-400 mt-1">✓</span><div><strong class="text-neutral-100">The LGPD applies to the agent</strong><span class="text-neutral-400"> — and you’re responsible.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-amber-400 mt-1">✓</span><div><strong class="text-neutral-100">Only the minimum, with codes</strong><span class="text-neutral-400"> — and all four doors checked.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-amber-400 mb-2">Next track:</h3>
+<p class="text-neutral-300">Track 5 — Own the outcome</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Back to the trail</a>
+<a class="flex-1 text-center px-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-500 transition-colors" href="../trilha5/index.html">Track 5: Own the outcome →</a>
+</div>
+</div>
+</section>
+</main>
+<aside class="hidden lg:block">
+<nav aria-label="Page index" class="sticky top-24" data-inema-toc="">
+<p class="text-sm text-neutral-400 mb-3"><span data-inema-section-counter="">Section 1 of 6</span></p>
+<ol class="space-y-2 text-sm">
+<li><a class="text-neutral-400 hover:text-amber-400" href="#topico-1">1. Spending limit</a></li>
+<li><a class="text-neutral-400 hover:text-amber-400" href="#topico-2">2. Stop the loop</a></li>
+<li><a class="text-neutral-400 hover:text-amber-400" href="#topico-3">3. Isolation</a></li>
+<li><a class="text-neutral-400 hover:text-amber-400" href="#topico-4">4. LGPD</a></li>
+<li><a class="text-neutral-400 hover:text-amber-400" href="#topico-5">5. Just the essentials</a></li>
+<li><a class="text-neutral-400 hover:text-amber-400" href="#topico-6">6. Four doors</a></li>
+</ol>
+</nav>
+</aside>
+</div>
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>Agent under Control · 2026 | <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> - <a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200" href="https://inema.pro" target="_blank">PRO</a></p>
+</div>
+</footer>
+<script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const _html = document.documentElement;
+    if (!_html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); }
+    else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      if (window.INEMA && INEMA.setPref) { INEMA.setPref('theme', _html.classList.contains('dark') ? 'claro' : 'inema-dark'); }
+      else { _html.classList.toggle('dark'); }
+      themeToggleDarkIcon.classList.toggle('hidden', _html.classList.contains('dark'));
+      themeToggleLightIcon.classList.toggle('hidden', !_html.classList.contains('dark'));
+      try { localStorage.setItem('theme', _html.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
+    });
+    function toggleTopic(button) {
+      const item = button.closest('.topic-item');
+      const exp = item.querySelector('.topic-explanation');
+      const card = button.closest('[id^="modulo-"]') || document;
+      card.querySelectorAll('.topic-explanation.active').forEach(e => { if (e !== exp) { e.classList.remove('active'); const b = e.parentElement.querySelector('[aria-controls]'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+      exp.classList.toggle('active');
+      button.setAttribute('aria-expanded', exp.classList.contains('active') ? 'true' : 'false');
+    }
+    let _lastModalTrigger = null;
+    function openModal(id){ const m=document.getElementById(id); if(m){ _lastModalTrigger=document.activeElement; m.classList.remove('hidden'); document.body.style.overflow='hidden'; const c=m.querySelector('button'); if(c) c.focus(); } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; if(_lastModalTrigger){ _lastModalTrigger.focus(); _lastModalTrigger=null; } }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.INEMA && INEMA.registerCheck) {
+        INEMA.registerCheck('modulo-4-3#q1', { answer: 1, explain: {
+          '0': 'A tarefa só precisa saber quem falta. CPF, telefone e procedimentos (dado de saúde) são exposição sem motivo.',
+          '1': 'Isso. Minimizar e anonimizar: código e número de faltas bastam, e a tabela que liga código a nome fica só com ela.',
+          '2': 'Depois que o dado chegou ao agente, pedir para apagar não garante nada. O mínimo tem que ser escolhido antes.'
+        } });
+      }
+    });
+  </script>
+</body>
+</html>

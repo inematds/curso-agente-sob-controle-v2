@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="agscv2" name="inema-course"/>
+<title>The spreadsheet in 4 blocks | Agent Under Control</title>
+<!-- ANTI-FOUC: bloqueante, ANTES do Tailwind -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; }
+        } else {
+          var legacy = localStorage.getItem('theme');
+          if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark';
+        }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = {
+        'inema-dark': { dark: true,  attr: null,        cs: 'dark'  },
+        'claro':      { dark: false, attr: null,        cs: 'light' },
+        'sepia':      { dark: false, attr: 'sepia',     cs: 'light' },
+        'foco':       { dark: null,  attr: 'foco',      cs: null    },
+        'contraste':  { dark: true,  attr: 'contraste', cs: 'dark'  }
+      };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+      html.setAttribute('data-font', p.font || 'inter');
+      html.setAttribute('data-accent', p.accent || 'emerald');
+      var s = html.style; var scale = (+p.fontScale || 100);
+      s.setProperty('--inema-font-scale', (scale / 100).toString());
+      s.setProperty('font-size', scale + '%');
+      s.setProperty('--measure', (+p.lineWidth || 68) + 'ch');
+      s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+      var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+        : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC = { emerald: [152,76,45], blue: [217,91,60], purple: [258,90,66], amber: [38,92,50], teal: [174,72,41], rose: [350,89,60] };
+      var a = ACC[p.accent] || ACC.emerald;
+      s.setProperty('--accent-h', a[0]+''); s.setProperty('--accent-s', a[1]+'%'); s.setProperty('--accent-l', a[2]+'%');
+      s.setProperty('--accent', 'hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch(e){} }
+  })();
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: {
+      primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<!-- Manifesto do curso (OBRIGATORIO em TODA pagina, identico) -->
+<script data-inema-manifest="" type="application/json">
+  {"course":"agscv2","tracks":[{"n":"1","title":"Por que agora","modules":[{"id":"1-1","title":"Responder não é agir","topics":6,"href":"curso/trilha1/modulo-1-1.html"},{"id":"1-2","title":"Mais capaz, mais limites","topics":6,"href":"curso/trilha1/modulo-1-2.html"}]},{"n":"2","title":"Achar a dor","modules":[{"id":"2-1","title":"A pergunta do 10×","topics":6,"href":"curso/trilha2/modulo-2-1.html"},{"id":"2-2","title":"Pedido não é problema","topics":6,"href":"curso/trilha2/modulo-2-2.html"}]},{"n":"3","title":"Controlar o sistema","modules":[{"id":"3-1","title":"As cinco chaves","topics":6,"href":"curso/trilha3/modulo-3-1.html"},{"id":"3-2","title":"Três regras e casos reais","topics":6,"href":"curso/trilha3/modulo-3-2.html"}]},{"n":"4","title":"O que quase ninguém conta","modules":[{"id":"4-1","title":"Ordens escondidas","topics":6,"href":"curso/trilha4/modulo-4-1.html"},{"id":"4-2","title":"Senhas e extensões","topics":6,"href":"curso/trilha4/modulo-4-2.html"},{"id":"4-3","title":"Gasto, isolamento e LGPD","topics":6,"href":"curso/trilha4/modulo-4-3.html"}]},{"n":"5","title":"Assumir o resultado","modules":[{"id":"5-1","title":"Métrica com dono","topics":6,"href":"curso/trilha5/modulo-5-1.html"},{"id":"5-2","title":"A planilha em 4 blocos","topics":6,"href":"curso/trilha5/modulo-5-2.html"}]}]}
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-200 { color: #1f2937; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #6b7280; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+
+    /* Light mode - acentos das 5 trilhas (emerald, blue, purple, amber, teal) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(217, 119, 6, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(217, 119, 6, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(217, 119, 6, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(217, 119, 6, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+    html:not(.dark) .text-teal-400 { color: #0d9488; }
+    html:not(.dark) .bg-teal-500\/20 { background-color: rgba(13, 148, 136, 0.12); }
+    html:not(.dark) .bg-teal-500\/10 { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .bg-teal-900\/20 { background-color: rgba(13, 148, 136, 0.07); }
+    html:not(.dark) .border-teal-500\/30 { border-color: rgba(13, 148, 136, 0.25); }
+    html:not(.dark) .hover\:bg-teal-500\/30:hover { background-color: rgba(13, 148, 136, 0.18); }
+    html:not(.dark) .hover\:text-teal-400:hover { color: #0d9488; }
+    html:not(.dark) .hover\:bg-teal-500\/10:hover { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-teal-400 { color: #0d9488; }
+
+    /* Light mode - remove gradientes e cores especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/40 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.22); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.06); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+
+    /* Light mode - nav */
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* Alvos de ancora abaixo do nav sticky */
+    [data-inema-topic], [id^="modulo-"], [id^="topico-"] { scroll-margin-top: 72px; }
+
+    /* SVG light mode + animacao */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-dash { to { stroke-dashoffset: -24; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+      .wf-flow { stroke-dasharray: 6 6; animation: wf-dash 1.2s linear infinite; }
+    }
+
+    /* Topicos expansiveis */
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+  </style>
+<link href="https://inematds.github.io/curso-agente-sob-controle-v2/curso/trilha5/modulo-5-2.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/en/curso/trilha5/modulo-5-2.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/es/curso/trilha5/modulo-5-2.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha5/modulo-5-2.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="modulo-5-2.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">EN</a><a href="../../../es/curso/trilha5/modulo-5-2.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-black focus:rounded-lg" href="#conteudo">Skip to content</a>
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-3">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🛡️</span>
+<span class="font-bold text-lg hidden lg:inline">Agent under Control</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+<span class="text-neutral-600">-</span>
+<a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200 text-sm font-medium" href="https://inema.pro" target="_blank">PRO</a>
+</div>
+<div class="flex items-center space-x-1">
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html">
+<span class="xl:hidden">T1</span><span class="hidden xl:inline">Why now</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" href="../trilha2/index.html">
+<span class="xl:hidden">T2</span><span class="hidden xl:inline">Find the pain point</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="xl:hidden">T3</span><span class="hidden xl:inline">Control</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors" href="../trilha4/index.html">
+<span class="xl:hidden">T4</span><span class="hidden xl:inline">Hidden risks</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-teal-400 bg-teal-500/10" href="index.html">
+<span class="xl:hidden">T5</span><span class="hidden xl:inline">Result</span>
+</a>
+<button class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-journey-open="" title="My journey" type="button">
+<span aria-hidden="true">◷</span><span class="hidden md:inline">Journey</span>
+<span class="inema-journey-badge" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<div class="relative">
+<button aria-controls="aparencia" aria-expanded="false" class="p-2 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-appearance-toggle="#aparencia" title="Appearance" type="button">
+<span aria-hidden="true" class="text-sm font-semibold">Aa</span><span class="sr-only">Appearance</span>
+</button>
+<div class="inema-appearance-pop" data-inema-appearance="" id="aparencia">
+<div aria-label="Topic" class="inema-segment">
+<button data-inema-set-theme="inema-dark" type="button">Dark</button>
+<button data-inema-set-theme="claro" type="button">Clear</button>
+<button data-inema-set-theme="sepia" type="button">Sepia</button>
+<button data-inema-set-theme="foco" type="button">Focus</button>
+<button data-inema-set-theme="contraste" type="button">High contrast</button>
+</div>
+<div aria-label="Source" class="inema-segment">
+<button data-inema-set-font="inter" type="button">Inter</button>
+<button data-inema-set-font="system" type="button">System</button>
+<button data-inema-set-font="leitura" type="button">Reading</button>
+</div>
+<div aria-label="Text length" class="inema-segment">
+<button data-inema-set-fontscale="100" type="button">A</button>
+<button data-inema-set-fontscale="112" type="button">A+</button>
+<button data-inema-set-fontscale="125" type="button">A++</button>
+</div>
+<div aria-label="Line width" class="inema-segment">
+<button data-inema-set-linewidth="60" type="button">Narrow</button>
+<button data-inema-set-linewidth="68" type="button">Medium</button>
+<button data-inema-set-linewidth="75" type="button">Wide</button>
+</div>
+<div aria-label="Subtext" class="inema-segment">
+<button data-inema-set-leading="1.45" type="button">Compact</button>
+<button data-inema-set-leading="1.7" type="button">Comfortable</button>
+</div>
+</div>
+</div>
+<button aria-label="Toggle light/dark theme" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<nav aria-label="Navigation track" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-teal-400" href="../../index.html">Start</a><span>/</span>
+<a class="hover:text-teal-400" href="index.html">Track 5</a><span>/</span>
+<span class="text-teal-400">Module 5.2</span>
+</div>
+</nav>
+<header class="bg-gradient-to-br from-teal-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="5-2" data-inema-track="5">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-teal-500/20 text-teal-400 text-xs font-semibold rounded-full mb-4">MODULE 5.2</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">📋 The spreadsheet in 4 blocks</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">Everything you decided in the course on one page: the pain point, controls, security, and results. This is what you show when someone asks, "who's responsible for this agent?"</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-teal-400">6</div><div class="text-xs text-neutral-400">Topics</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-teal-400">~40</div><div class="text-xs text-neutral-400">Minutes</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-teal-400">Practical</div><div class="text-xs text-neutral-400">Level</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-teal-400">Deliver</div><div class="text-xs text-neutral-400">Type</div></div>
+</div>
+<div aria-label="Module 5.2 progress" aria-valuemax="100" aria-valuemin="0" class="mt-6 max-w-2xl" data-inema-meter="modulo:5-2" role="progressbar">
+<div class="flex justify-between text-xs text-neutral-400 mb-1"><span data-inema-meter-frac="">0 of 6</span><span data-inema-meter-pct="">0%</span></div>
+<div class="inema-bar"><div class="inema-bar__fill" data-inema-meter-fill=""></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[1fr_220px] lg:gap-10">
+<main class="min-w-0" data-inema-module="5-2" data-inema-track="5" id="conteudo">
+<!-- ===================== TOPICO 1 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-5-2#topico-1" id="topico-1">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 font-bold text-xl">1</span>
+<h2 class="text-2xl font-bold flex-1">See the full spreadsheet</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m5-2-t1-p1">Each course learning path left you with a decision. Here, they become <strong class="text-teal-400">four blocks</strong> from a single spreadsheet, one for each agent you turn on.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m5-2-t1-p2">You don’t need a formula or fancy columns. It can be a text document, a spreadsheet tab, or a sheet of paper posted on the office wall. What matters is that no block is left empty.</p>
+<div class="rounded-2xl border border-teal-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="The agent spreadsheet divided into four blocks, from left to right: 1 pain point, from track 2; 2 control, from track 3; 3 security, from track 4; 4 outcome, from track 5, highlighted. An arrow below points back, indicating a review every 30 days." class="w-full h-auto" role="img" viewbox="0 0 800 270">
+<defs>
+<pattern height="32" id="m52-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#2dd4bf" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m52-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m52-arrow-c" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m52-grid)" height="270" width="800" x="0" y="0"></rect>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="400" y="30">AGENT SPREADSHEET · one per agent</text>
+<g font-family="Inter,sans-serif" text-anchor="middle">
+<rect fill="#0f1b33" height="150" rx="12" stroke="#60a5fa" stroke-width="2" width="176" x="24" y="50"></rect>
+<text fill="#60a5fa" font-size="14" font-weight="600" x="112" y="80">1 · PAIN POINT</text>
+<text fill="#bfdbfe" font-size="12" x="112" y="108">desired outcome</text>
+<text fill="#bfdbfe" font-size="12" x="112" y="128">what breaks at 10×</text>
+<text fill="#bfdbfe" font-size="12" x="112" y="148">today's proof</text>
+<text fill="#9ca3af" font-size="11" x="112" y="185">comes from Track 2</text>
+<rect fill="#1e1233" height="150" rx="12" stroke="#c084fc" stroke-width="2" width="176" x="214" y="50"></rect>
+<text fill="#c084fc" font-size="14" font-weight="600" x="302" y="80">2 · CONTROL</text>
+<text fill="#e9d5ff" font-size="12" x="302" y="108">read · change · approve</text>
+<text fill="#e9d5ff" font-size="12" x="302" y="128">record</text>
+<text fill="#e9d5ff" font-size="12" x="302" y="148">shutdown button</text>
+<text fill="#9ca3af" font-size="11" x="302" y="185">comes from Track 3</text>
+<rect fill="#2a1d06" height="150" rx="12" stroke="#fbbf24" stroke-width="2" width="176" x="404" y="50"></rect>
+<text fill="#fbbf24" font-size="14" font-weight="600" x="492" y="80">3 · SECURITY</text>
+<text fill="#fde68a" font-size="12" x="492" y="108">hidden orders</text>
+<text fill="#fde68a" font-size="12" x="492" y="128">secrets · extensions</text>
+<text fill="#fde68a" font-size="12" x="492" y="148">expenses · data</text>
+<text fill="#9ca3af" font-size="11" x="492" y="185">comes from Track 4</text>
+<g filter="url(#m52-glow)"><rect class="wf-a" fill="#0a2422" height="150" rx="12" stroke="#2dd4bf" stroke-width="2" width="182" x="594" y="50"></rect></g>
+<text fill="#2dd4bf" font-size="14" font-weight="600" x="685" y="80">4 · RESULT</text>
+<text fill="#99f6e4" font-size="12" x="685" y="108">metric · today’s value</text>
+<text fill="#99f6e4" font-size="12" x="685" y="128">goal · deadline</text>
+<text fill="#99f6e4" font-size="12" x="685" y="148">owner · audit</text>
+<text fill="#9ca3af" font-size="11" x="685" y="185">comes from Track 5</text>
+</g>
+<path class="wf-flow" d="M685,204 C 685,250 112,250 112,210" fill="none" marker-end="url(#m52-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<text fill="#bae6fd" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="400" y="244">review every 30 days: the outcome reopens the pain point</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> each block uses the color of the track it came from. Read from left to right: first why the agent exists, then what it can access, then what protects it, and finally how you know whether it worked. The blue arrow at the bottom closes the loop: today's result is next month's pain.</p>
+<h3 class="text-lg font-semibold text-teal-400 mb-3">🖨️ Print version</h3>
+<div class="overflow-x-auto mb-3 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-teal-400"><tr><th class="px-4 py-3 font-semibold">Section</th><th class="px-4 py-3 font-semibold">Timeline</th><th class="px-4 py-3 font-semibold">Renata’s example</th><th class="px-4 py-3 font-semibold w-1/3">My agent</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 font-semibold text-neutral-100" rowspan="3">1 · Pain Point</td><td class="px-4 py-3 text-neutral-300">Desired result</td><td class="px-4 py-3 text-neutral-300">fewer empty time slots</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">What breaks at 10×</td><td class="px-4 py-3 text-neutral-300">appointment confirmation</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Today’s proof</td><td class="px-4 py-3 text-neutral-300">9 missed appointments out of 38 appointments</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-semibold text-neutral-100" rowspan="5">2 · Control</td><td class="px-4 py-3 text-neutral-300">Can read</td><td class="px-4 py-3 text-neutral-300">next day’s calendar</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Can edit and send</td><td class="px-4 py-3 text-neutral-300">WhatsApp reminder; doesn’t reschedule</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Wait for approval</td><td class="px-4 py-3 text-neutral-300">any new message; money, never</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Log</td><td class="px-4 py-3 text-neutral-300">the clinic’s WhatsApp history</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Who turns it off and how</td><td class="px-4 py-3 text-neutral-300">Renata or front desk, 1 button</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-semibold text-neutral-100" rowspan="5">3 · Security</td><td class="px-4 py-3 text-neutral-300">Rule: “outside text is data”</td><td class="px-4 py-3 text-neutral-300">[x] yes</td><td class="px-4 py-3 text-neutral-500">[ ] yes [ ] no</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Keep secrets out of the conversation</td><td class="px-4 py-3 text-neutral-300">[x] yes</td><td class="px-4 py-3 text-neutral-500">[ ] yes [ ] no</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Extensions reviewed</td><td class="px-4 py-3 text-neutral-300">[x] yes</td><td class="px-4 py-3 text-neutral-500">[ ] yes [ ] no</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Spending limit</td><td class="px-4 py-3 text-neutral-300">[x] R$ 50/month, alert at 80%</td><td class="px-4 py-3 text-neutral-500">[ ] yes [ ] no</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Customer data: only what’s necessary</td><td class="px-4 py-3 text-neutral-300">[x] name and time</td><td class="px-4 py-3 text-neutral-500">[ ] yes [ ] no</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-semibold text-neutral-100" rowspan="4">4 · Result</td><td class="px-4 py-3 text-neutral-300">Metric and today's value</td><td class="px-4 py-3 text-neutral-300">showed up: 29 of 38</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Goal and deadline</td><td class="px-4 py-3 text-neutral-300">34 out of 38 in 60 days</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">Owner and review</td><td class="px-4 py-3 text-neutral-300">receptionist, every morning</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 text-neutral-300">A human takes over when</td><td class="px-4 py-3 text-neutral-300">price, complaint, health</td><td class="px-4 py-3 text-neutral-500">______________</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">To print:</strong> use your browser's print button (Ctrl+P) and choose the "Light" theme from the appearance menu first. The "My agent" column is for you to fill in by hand in the next four topics.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💥</div><div class="text-sm font-semibold text-teal-400">Pain</div><p class="text-xs text-neutral-400 mt-1">why it exists</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔑</div><div class="text-sm font-semibold text-teal-400">Control</div><p class="text-xs text-neutral-400 mt-1">what it can touch</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🛡️</div><div class="text-sm font-semibold text-teal-400">Security</div><p class="text-xs text-neutral-400 mt-1">the closed doors</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📊</div><div class="text-sm font-semibold text-teal-400">Result</div><p class="text-xs text-neutral-400 mt-1">whether it worked and who takes care of it</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 hover:bg-teal-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 2 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-5-2#topico-2" id="topico-2">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 font-bold text-xl">2</span>
+<h2 class="text-2xl font-bold flex-1">Fill out block 1: pain point</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m5-2-t2-p1">Block 1 answers “why does this agent exist?” Three lines: the <strong class="text-teal-400">desired outcome</strong>, what would break if the business grew ten times and the <strong class="text-teal-400">today's proof</strong> — a counted number.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m5-2-t2-p2">If you can’t fill out this section, stop. An agent without a clear pain point becomes an expensive toy—and a toy with access to your WhatsApp.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-teal-900/20 rounded-xl border border-teal-500/30 p-6">
+<h4 class="font-bold text-teal-400 mb-4">✓ Block 1 filled out well</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>“Fewer empty time slots” — that’s an outcome, not a request.</span></li>
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>“At 10×, appointment confirmations break first.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>"9 no-shows out of 38 appointments last month."</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Block 1 that doesn't work</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“More clients” — that’s a request, not a pain point.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“Automate customer service” — that’s a solution, not a problem.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“Lots of no-shows” — without a number, it proves nothing.</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Marcos’s block 1</h3>
+<p class="text-neutral-300 text-sm">Desired result: close the month without chasing down documents. At 10×: Júlia’s review becomes the bottleneck. Today’s proof: a full morning spent reviewing each day, recorded for a week.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🎯</div><div class="text-sm font-semibold text-teal-400">Result</div><p class="text-xs text-neutral-400 mt-1">what you want</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💥</div><div class="text-sm font-semibold text-teal-400">10×</div><p class="text-xs text-neutral-400 mt-1">what breaks first</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔢</div><div class="text-sm font-semibold text-teal-400">Today’s proof</div><p class="text-xs text-neutral-400 mt-1">one counted number</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🛑</div><div class="text-sm font-semibold text-teal-400">Empty?</div><p class="text-xs text-neutral-400 mt-1">don’t turn on the agent</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 hover:bg-teal-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 3 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-5-2#topico-3" id="topico-3">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 font-bold text-xl">3</span>
+<h2 class="text-2xl font-bold flex-1">Fill out block 2: control</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m5-2-t3-p1">Block 2 is the five keys from Track 3, one per line: what the agent can <strong>read</strong>, what may <strong>change and submit</strong>, what awaits your <strong>approval</strong>, where it goes <strong>record</strong> and who presses the <strong>shutdown button</strong>.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m5-2-t3-p2">Write it so someone else can understand without asking. “Calendar access” is vague. “Read the next day’s calendar; don’t schedule or cancel” is control.</p>
+<div class="space-y-5 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center"><span class="text-teal-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Read</h4><p class="text-neutral-300 text-sm">Only what the task needs. Renata: next day’s schedule, name, and time.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center"><span class="text-teal-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Change and send</h4><p class="text-neutral-300 text-sm">The minimum, written with what it <em>no</em> do it. Renata: send the template reminder; don't reschedule, don't reply with the price.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center"><span class="text-teal-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Approval</h4><p class="text-neutral-300 text-sm">Money, deletion, and publishing always wait for your yes. Messages outside the agreed format do, too.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center"><span class="text-teal-400 font-bold">4</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Log</h4><p class="text-neutral-300 text-sm">The exact place where you check what it did. “The clinic’s WhatsApp history” works; “in the system” doesn’t.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center"><span class="text-teal-400 font-bold">5</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Shutdown button</h4><p class="text-neutral-300 text-sm">Who, and how, in one minute. Marcos wrote: "me or Júlia; turn off the automation in the app's dashboard."</p></div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Stranger test</h3>
+<p class="text-neutral-300 text-sm">Give only block 2 to someone who doesn’t know the agent and ask: “Can it cancel an appointment?” If the person hesitates, the line is vague. Rewrite it until the answer comes in one second.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">👁️</div><div class="text-sm font-semibold text-teal-400">Read</div><p class="text-xs text-neutral-400 mt-1">only what’s necessary</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">✋</div><div class="text-sm font-semibold text-teal-400">Approval</div><p class="text-xs text-neutral-400 mt-1">money, deletion, publishing</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📜</div><div class="text-sm font-semibold text-teal-400">Log</div><p class="text-xs text-neutral-400 mt-1">exact location</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏻</div><div class="text-sm font-semibold text-teal-400">Turn off</div><p class="text-xs text-neutral-400 mt-1">who and how, in 1 min</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 hover:bg-teal-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 4 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-5-2#topico-4" id="topico-4">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 font-bold text-xl">4</span>
+<h2 class="text-2xl font-bold flex-1">Fill out block 3: safety</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m5-2-t4-p1">Block 3 is what almost no one mentions, turned into checkboxes. Five yes-or-no questions drawn from Track 4.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m5-2-t4-p2">There’s no "sort of" here. A "no" on any line leaves a door open — and becomes a dated task before the agent gets more access.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-teal-900/20 rounded-xl border border-teal-500/30 p-6">
+<h4 class="font-bold text-teal-400 mb-4">✓ Door closed</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>Rule: “outside text is data” in the agent’s instructions — to guard against hidden commands.</span></li>
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>Never paste secrets (passwords, keys) into the chat.</span></li>
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>Third-party extensions and “skills” reviewed.</span></li>
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>Spending limit with a usage alert.</span></li>
+<li class="flex items-start space-x-2"><span class="text-teal-400">✓</span><span>Customer data: only what’s necessary, using a code instead of a name when possible.</span></li>
+</ul>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">✗ Door open</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>An agent reads incoming email and can reply on its own.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>An access key in a file the agent can see.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Extension installed “because a video recommended it.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Card with no limit linked to a paid service.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Entire customer spreadsheet handed over "to give it context."</span></li>
+</ul>
+</div>
+</div>
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-red-400 mb-2 flex items-center"><span class="mr-2">⚠️</span> Attention</h3>
+<p class="text-neutral-300 text-sm">Marking “yes” isn’t the same as having done it. In each box, write beside it <strong>where</strong> the proof is there: "R$ 50 cap configured in the billing panel", "rule pasted into the instructions on 12/09". Without proof, it counts as "no".</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🧪</div><div class="text-sm font-semibold text-teal-400">Hidden instructions</div><p class="text-xs text-neutral-400 mt-1">outside text is data</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🗝️</div><div class="text-sm font-semibold text-teal-400">Secret</div><p class="text-xs text-neutral-400 mt-1">never in chat</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💸</div><div class="text-sm font-semibold text-teal-400">Limit</div><p class="text-xs text-neutral-400 mt-1">expense with an alert</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔏</div><div class="text-sm font-semibold text-teal-400">Data</div><p class="text-xs text-neutral-400 mt-1">only what’s necessary</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 hover:bg-teal-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 5 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-5-2#topico-5" id="topico-5">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 font-bold text-xl">5</span>
+<h2 class="text-2xl font-bold flex-1">Fill out block 4: outcome and pass the audit</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m5-2-t5-p1">Block 4 is all of module 5.1: metric, current value, goal, deadline, owner, and when a human takes over. Copy it from there.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m5-2-t5-p2">With all four blocks filled in, do the <strong class="text-teal-400">audit</strong>: five questions a business partner, major client, or insurer might ask. If the spreadsheet answers each one in less than a minute, you passed.</p>
+<div class="rounded-2xl border border-teal-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="The five audit questions on the left, each linked by an arrow to the spreadsheet section that answers it on the right. Which agents handle money and who can shut them down point to the control section. Which ones touch customer data points to security. Where the record is kept points to control. What happens if it makes a mistake at 3 a.m. points to results, highlighted." class="w-full h-auto" role="img" viewbox="0 0 800 300">
+<defs>
+<pattern height="32" id="m52a-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#2dd4bf" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m52a-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m52a-arrow-c" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m52a-grid)" height="300" width="800" x="0" y="0"></rect>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="200" y="28">THE QUESTION</text>
+<text fill="#2dd4bf" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="650" y="28">WHERE THE SPREADSHEET HAS THE ANSWER</text>
+<g font-family="Inter,sans-serif" font-size="12">
+<rect fill="#1f2937" height="36" rx="9" stroke="#4b5563" stroke-width="2" width="352" x="24" y="44"></rect>
+<text fill="#e5e7eb" x="40" y="67">💳 Which agents handle money?</text>
+<rect fill="#1f2937" height="36" rx="9" stroke="#4b5563" stroke-width="2" width="352" x="24" y="92"></rect>
+<text fill="#e5e7eb" x="40" y="115">🔏 Which ones handle customer data?</text>
+<rect fill="#1f2937" height="36" rx="9" stroke="#4b5563" stroke-width="2" width="352" x="24" y="140"></rect>
+<text fill="#e5e7eb" x="40" y="163">📜 Where is the record?</text>
+<rect fill="#1f2937" height="36" rx="9" stroke="#4b5563" stroke-width="2" width="352" x="24" y="188"></rect>
+<text fill="#e5e7eb" x="40" y="211">⏻ Who turns it off?</text>
+<rect fill="#1f2937" height="36" rx="9" stroke="#f87171" stroke-width="2" width="352" x="24" y="236"></rect>
+<text fill="#fecaca" x="40" y="259">🌙 What if it makes a mistake at 3 a.m.?</text>
+<path class="wf-flow" d="M378,62 C 460,62 480,90 560,95" fill="none" marker-end="url(#m52a-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<path class="wf-flow" d="M378,110 C 460,110 480,160 560,165" fill="none" marker-end="url(#m52a-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<path class="wf-flow" d="M378,158 C 460,158 480,110 560,105" fill="none" marker-end="url(#m52a-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<path class="wf-flow" d="M378,206 C 460,206 480,120 560,115" fill="none" marker-end="url(#m52a-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<path class="wf-flow" d="M378,254 C 460,254 480,235 560,232" fill="none" marker-end="url(#m52a-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<rect fill="#1e1233" height="56" rx="12" stroke="#c084fc" stroke-width="2" width="212" x="564" y="76"></rect>
+<text fill="#c084fc" font-size="13" font-weight="600" text-anchor="middle" x="670" y="100">2 · CONTROL</text>
+<text fill="#e9d5ff" font-size="11" text-anchor="middle" x="670" y="118">approval · logging · shutdown</text>
+<rect fill="#2a1d06" height="44" rx="12" stroke="#fbbf24" stroke-width="2" width="212" x="564" y="146"></rect>
+<text fill="#fbbf24" font-size="13" font-weight="600" text-anchor="middle" x="670" y="173">3 · SECURITY</text>
+<g filter="url(#m52a-glow)"><rect class="wf-a" fill="#0a2422" height="56" rx="12" stroke="#2dd4bf" stroke-width="2" width="212" x="564" y="206"></rect></g>
+<text fill="#2dd4bf" font-size="13" font-weight="600" text-anchor="middle" x="670" y="230">4 · RESULT</text>
+<text fill="#99f6e4" font-size="11" text-anchor="middle" x="670" y="248">owner · human takes over when</text>
+</g>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> each question on the left has an arrow to the block that answers it. If an arrow reaches an empty block, the audit failed there. The red-outlined question is the toughest: nobody is watching at 3 a.m.—so the answer needs to be written down in advance (approval, limit, who gets notified).</p>
+<div class="bg-teal-900/20 rounded-xl border border-teal-500/30 p-6 mb-6">
+<h3 class="text-base font-semibold text-teal-400 mb-2 flex items-center"><span class="mr-2">🆕</span> New here? "Audit"</h3>
+<p class="text-neutral-300 text-sm">It’s not surveillance or paperwork. <strong>Audit</strong>, here, means having someone from outside check whether what you say about the agent is written down and can be proven. You can do it yourself: read the five questions aloud and answer by looking only at the spreadsheet.</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-6 mb-6" data-inema-check="modulo-5-2#q1">
+<p class="font-medium mb-4">Quick test (optional): Marcos’s agent sends fee requests by email. During the audit, someone asks, “what if it makes a mistake at 3 a.m.?” Which answer shows that the spreadsheet is ready?</p>
+<div class="space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">“It doesn’t usually make mistakes; we’ve tested it a lot.”</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">“In the morning, Júlia checks and corrects anything that came out wrong.”</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">“The payment request waits for Marcos’s approval; at 3 a.m., it stays in the draft until he approves it.”</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📊</div><div class="text-sm font-semibold text-teal-400">Section 4</div><p class="text-xs text-neutral-400 mt-1">the entire module 5.1</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🧐</div><div class="text-sm font-semibold text-teal-400">Audit</div><p class="text-xs text-neutral-400 mt-1">five questions</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">⏱️</div><div class="text-sm font-semibold text-teal-400">One minute</div><p class="text-xs text-neutral-400 mt-1">per response</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🌙</div><div class="text-sm font-semibold text-teal-400">3 a.m.</div><p class="text-xs text-neutral-400 mt-1">the answer comes first</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 hover:bg-teal-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 6 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-5-2#topico-6" id="topico-6">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/20 text-teal-400 font-bold text-xl">6</span>
+<h2 class="text-2xl font-bold flex-1">Generate your spreadsheet with an AI chat</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m5-2-t6-p1">If filling it out by hand feels daunting, have an AI chat interview you. It asks one question at a time, then puts together the four sections in your own words.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m5-2-t6-p2">Attention: here it is a <strong>assistant</strong>, not an agent. It only writes text. It doesn't need access to anything — and don't give it any. No passwords, keys, or customer spreadsheets in the conversation.</p>
+<div class="bg-dark-800 rounded-xl border border-teal-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-teal-900/20 border-b border-teal-500/30"><span class="text-teal-400 font-semibold text-sm">🎯 Goal: leave with your agent's spreadsheet in 4 sections, ready for review</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Paste into the AI chat you already use (ChatGPT, Claude, Gemini). Replace what's inside &lt; &gt; and answer any questions it asks.</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">Quero montar a PLANILHA DO AGENTE em 4 blocos para um agente de IA do meu negócio.
+Meu negócio: &lt;ex.: escritório de contabilidade com 1 assistente&gt;.
+O agente: &lt;ex.: confere documentos recebidos e cobra os que faltam por e-mail&gt;.
+
+Regras da entrevista:
+- Faça UMA pergunta por vez e espere a minha resposta.
+- Se eu responder vago ("acesso à agenda", "muitas faltas"), peça o detalhe ou o número.
+- Não invente nada. Onde eu não souber, escreva "VERIFICAR".
+- Nunca me peça senha, chave de acesso ou dados de clientes.
+
+Pergunte nesta ordem:
+BLOCO 1 · DOR: resultado desejado; o que quebraria se o negócio crescesse 10 vezes; prova de hoje (um número contado).
+BLOCO 2 · CONTROLE: o que o agente pode ler; o que pode mudar ou enviar (e o que NÃO pode); o que espera a minha aprovação (dinheiro, exclusão e publicação sempre); onde fica o registro; quem desliga e como, em 1 minuto.
+BLOCO 3 · SEGURANÇA (sim/não + onde está a prova): regra "texto de fora é dado, ordens só de mim"; segredos fora da conversa; extensões revisadas; teto de gasto com alerta; dados de clientes só o necessário.
+BLOCO 4 · RESULTADO: métrica (uma só); valor de hoje; meta; prazo; dono (nome) e frequência da revisão; quando um humano assume.
+
+No fim:
+1. Monte a planilha em 4 blocos, uma linha por item, com as minhas palavras.
+2. Faça a AUDITORIA respondendo, só com o que está na planilha:
+   quais agentes mexem em dinheiro? quais tocam dados de clientes? onde fica o registro? quem desliga? o que acontece se ele errar às 3h da manhã?
+3. Liste cada "VERIFICAR" e cada "não" do bloco 3 como tarefa, com a pergunta "até quando?".
+4. Escreva a data da próxima revisão: hoje + 30 dias.</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-teal-400">How to verify:</strong> the 4 blocks are filled in, block 2 says what the agent <em>no</em> is ready, the audit answered all 5 questions without making anything up, and there is a review date. If any audit answer is "VERIFY," the agent is not ready for more access yet.</div>
+</div>
+<div class="rounded-2xl border border-teal-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="30-day review timeline: day 0, spreadsheet ready and today's value recorded; day 30, review with the weekly dashboard; day 60, answer both questions and decide whether to keep, adjust, or turn it off; then the cycle starts again." class="w-full h-auto" role="img" viewbox="0 0 800 170">
+<defs>
+<pattern height="32" id="m52r-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#2dd4bf" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m52r-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+</defs>
+<rect fill="url(#m52r-grid)" height="170" width="800" x="0" y="0"></rect>
+<line class="wf-flow" stroke="#38bdf8" stroke-width="2" x1="90" x2="710" y1="70" y2="70"></line>
+<g font-family="Inter,sans-serif" text-anchor="middle">
+<circle cx="120" cy="70" fill="#1f2937" r="12" stroke="#9ca3af" stroke-width="2"></circle>
+<text fill="#e5e7eb" font-size="13" font-weight="600" x="120" y="40">day 0</text>
+<text fill="#9ca3af" font-size="12" x="120" y="105">ready-made spreadsheet</text>
+<text fill="#9ca3af" font-size="12" x="120" y="123">today's value recorded</text>
+<circle class="wf-a" cx="400" cy="70" fill="#0b1f2e" r="12" stroke="#38bdf8" stroke-width="2"></circle>
+<text fill="#bae6fd" font-size="13" font-weight="600" x="400" y="40">day 30</text>
+<text fill="#bae6fd" font-size="12" x="400" y="105">review: weekly dashboard,</text>
+<text fill="#bae6fd" font-size="12" x="400" y="123">block 3 tasks</text>
+<g filter="url(#m52r-glow)"><circle cx="680" cy="70" fill="#0a2422" r="14" stroke="#2dd4bf" stroke-width="2"></circle></g>
+<text fill="#2dd4bf" font-size="13" font-weight="600" x="680" y="40">day 60</text>
+<text fill="#99f6e4" font-size="12" x="680" y="105">two questions:</text>
+<text fill="#99f6e4" font-size="12" x="680" y="123">keep, adjust, or turn off</text>
+</g>
+<text fill="#6b7280" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="400" y="158">and the cycle starts over: every 30 days, the entire spreadsheet is read again</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> The spreadsheet isn’t a document you make once and file away. Each dot is a meeting scheduled on the owner’s calendar. On day 60, the matrix from module 5.1 decides the agent’s fate—and the spreadsheet is rewritten to reflect what changed.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💬</div><div class="text-sm font-semibold text-teal-400">Interview</div><p class="text-xs text-neutral-400 mt-1">one question at a time</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🚫</div><div class="text-sm font-semibold text-teal-400">No secrets</div><p class="text-xs text-neutral-400 mt-1">no passwords in chat</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">❓</div><div class="text-sm font-semibold text-teal-400">VERIFY</div><p class="text-xs text-neutral-400 mt-1">becomes a task with a due date</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔁</div><div class="text-sm font-semibold text-teal-400">30 days</div><p class="text-xs text-neutral-400 mt-1">reread in full</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500/20 border border-teal-500/30 text-teal-400 hover:bg-teal-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== RESUMO / FECHAMENTO ===================== -->
+<section class="mb-12">
+<div class="bg-gradient-to-br from-teal-900/40 via-dark-800 to-dark-800 rounded-xl border border-teal-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">🎓</span> Module summary</h2>
+<div class="space-y-4 mb-8">
+<div class="flex items-start space-x-3"><span class="text-teal-400 mt-1">✓</span><div><strong class="text-neutral-100">One spreadsheet per agent</strong><span class="text-neutral-400"> — pain, control, security, and results.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-teal-400 mt-1">✓</span><div><strong class="text-neutral-100">Pain with a number</strong><span class="text-neutral-400"> — without it, the agent won’t connect.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-teal-400 mt-1">✓</span><div><strong class="text-neutral-100">Control that an outsider can understand</strong><span class="text-neutral-400"> — including what it must not do.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-teal-400 mt-1">✓</span><div><strong class="text-neutral-100">Security with proof</strong><span class="text-neutral-400"> — “yes” without proof means “no.”</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-teal-400 mt-1">✓</span><div><strong class="text-neutral-100">An audit in five questions</strong><span class="text-neutral-400"> — and a review every 30 days.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-teal-400 mb-2">End of the course</h3>
+<p class="text-neutral-300">You started by seeing that responding isn’t the same as acting. You finish with a sheet that says why your agent exists, what it can touch, what protects it, and how you know it worked. The more it does on its own, the tighter the limits—and you’re still the one who decides.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Back to the trail</a>
+<a class="flex-1 text-center px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-500 transition-colors" href="../../index.html">Finish: return to the beginning</a>
+</div>
+</div>
+</section>
+</main>
+<aside class="hidden lg:block">
+<nav aria-label="Page index" class="sticky top-24" data-inema-toc="">
+<p class="text-sm text-neutral-400 mb-3"><span data-inema-section-counter="">Section 1 of 6</span></p>
+<ol class="space-y-2 text-sm">
+<li><a class="text-neutral-400 hover:text-teal-400" href="#topico-1">1. The entire spreadsheet</a></li>
+<li><a class="text-neutral-400 hover:text-teal-400" href="#topico-2">2. Block 1: pain point</a></li>
+<li><a class="text-neutral-400 hover:text-teal-400" href="#topico-3">3. Block 2: control</a></li>
+<li><a class="text-neutral-400 hover:text-teal-400" href="#topico-4">4. Block 3: security</a></li>
+<li><a class="text-neutral-400 hover:text-teal-400" href="#topico-5">5. Result and audit</a></li>
+<li><a class="text-neutral-400 hover:text-teal-400" href="#topico-6">6. Generate with AI</a></li>
+</ol>
+</nav>
+</aside>
+</div>
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>Agent under Control · 2026 | <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> - <a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200" href="https://inema.pro" target="_blank">PRO</a></p>
+</div>
+</footer>
+<script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const _html = document.documentElement;
+    if (!_html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); }
+    else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      if (window.INEMA && INEMA.setPref) { INEMA.setPref('theme', _html.classList.contains('dark') ? 'claro' : 'inema-dark'); }
+      else { _html.classList.toggle('dark'); }
+      themeToggleDarkIcon.classList.toggle('hidden', _html.classList.contains('dark'));
+      themeToggleLightIcon.classList.toggle('hidden', !_html.classList.contains('dark'));
+      try { localStorage.setItem('theme', _html.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
+    });
+    function toggleTopic(button) {
+      const item = button.closest('.topic-item');
+      const exp = item.querySelector('.topic-explanation');
+      const card = button.closest('[id^="modulo-"]') || document;
+      card.querySelectorAll('.topic-explanation.active').forEach(e => { if (e !== exp) { e.classList.remove('active'); const b = e.parentElement.querySelector('[aria-controls]'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+      exp.classList.toggle('active');
+      button.setAttribute('aria-expanded', exp.classList.contains('active') ? 'true' : 'false');
+    }
+    let _lastModalTrigger = null;
+    function openModal(id){ const m=document.getElementById(id); if(m){ _lastModalTrigger=document.activeElement; m.classList.remove('hidden'); document.body.style.overflow='hidden'; const c=m.querySelector('button'); if(c) c.focus(); } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; if(_lastModalTrigger){ _lastModalTrigger.focus(); _lastModalTrigger=null; } }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.INEMA && INEMA.registerCheck) {
+        INEMA.registerCheck('modulo-5-2#q1', { answer: 2, explain: {
+          '0': 'Confiança não é controle. A auditoria pergunta o que está escrito na planilha, e "não costuma errar" não está em nenhum bloco.',
+          '1': 'Às 3h a cobrança errada já chegou ao cliente. Corrigir de manhã é pedir desculpas, não controlar.',
+          '2': 'Isso. Cobrança mexe com dinheiro, então espera aprovação. Às 3h, o erro fica no rascunho — e a resposta já estava escrita no bloco 2.'
+        } });
+      }
+    });
+  </script>
+</body>
+</html>

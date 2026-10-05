@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="agscv2" name="inema-course"/>
+<title>A request isn't a problem | Agent Under Control</title>
+<!-- ANTI-FOUC: bloqueante, ANTES do Tailwind -->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var DEF = { theme: 'inema-dark', font: 'inter', fontScale: 100, lineWidth: 68, leading: 1.7, accent: 'emerald' };
+      function clone(o) { var r = {}; for (var x in o) r[x] = o[x]; return r; }
+      var p = clone(DEF);
+      try {
+        var raw = localStorage.getItem('inema.prefs');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') { for (var k in DEF) if (parsed[k] != null) p[k] = parsed[k]; }
+        } else {
+          var legacy = localStorage.getItem('theme');
+          if (legacy === 'light') p.theme = 'claro'; else if (legacy === 'dark') p.theme = 'inema-dark';
+        }
+      } catch (e) { p = clone(DEF); }
+      var THEMES = {
+        'inema-dark': { dark: true,  attr: null,        cs: 'dark'  },
+        'claro':      { dark: false, attr: null,        cs: 'light' },
+        'sepia':      { dark: false, attr: 'sepia',     cs: 'light' },
+        'foco':       { dark: null,  attr: 'foco',      cs: null    },
+        'contraste':  { dark: true,  attr: 'contraste', cs: 'dark'  }
+      };
+      var t = THEMES[p.theme] || THEMES['inema-dark'];
+      if (t.dark === true) html.classList.add('dark'); else if (t.dark === false) html.classList.remove('dark');
+      if (t.attr) html.setAttribute('data-theme', t.attr); else html.removeAttribute('data-theme');
+      html.style.colorScheme = (t.cs ? t.cs : (html.classList.contains('dark') ? 'dark' : 'light'));
+      html.setAttribute('data-font', p.font || 'inter');
+      html.setAttribute('data-accent', p.accent || 'emerald');
+      var s = html.style; var scale = (+p.fontScale || 100);
+      s.setProperty('--inema-font-scale', (scale / 100).toString());
+      s.setProperty('font-size', scale + '%');
+      s.setProperty('--measure', (+p.lineWidth || 68) + 'ch');
+      s.setProperty('--lh-body', (+p.leading || 1.7).toString());
+      var fam = p.font === 'system' ? 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+        : (p.font === 'leitura' ? '"Atkinson Hyperlegible", "Inter", system-ui, sans-serif' : '"Inter", system-ui, sans-serif');
+      s.setProperty('--font-body', fam);
+      var ACC = { emerald: [152,76,45], blue: [217,91,60], purple: [258,90,66], amber: [38,92,50], teal: [174,72,41], rose: [350,89,60] };
+      var a = ACC[p.accent] || ACC.emerald;
+      s.setProperty('--accent-h', a[0]+''); s.setProperty('--accent-s', a[1]+'%'); s.setProperty('--accent-l', a[2]+'%');
+      s.setProperty('--accent', 'hsl('+a[0]+' '+a[1]+'% '+a[2]+'%)');
+    } catch (err) { try { document.documentElement.classList.add('dark'); document.documentElement.style.colorScheme = 'dark'; } catch(e){} }
+  })();
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: {
+      primary: '#FACC15', dark: { 900: '#111827', 800: '#1f2937', 700: '#374151', 600: '#4b5563' } } } } }
+  </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="../../../assets/learn.css" rel="stylesheet"/>
+<!-- Manifesto do curso (OBRIGATORIO em TODA pagina, identico) -->
+<script data-inema-manifest="" type="application/json">
+  {"course":"agscv2","tracks":[{"n":"1","title":"Por que agora","modules":[{"id":"1-1","title":"Responder não é agir","topics":6,"href":"curso/trilha1/modulo-1-1.html"},{"id":"1-2","title":"Mais capaz, mais limites","topics":6,"href":"curso/trilha1/modulo-1-2.html"}]},{"n":"2","title":"Achar a dor","modules":[{"id":"2-1","title":"A pergunta do 10×","topics":6,"href":"curso/trilha2/modulo-2-1.html"},{"id":"2-2","title":"Pedido não é problema","topics":6,"href":"curso/trilha2/modulo-2-2.html"}]},{"n":"3","title":"Controlar o sistema","modules":[{"id":"3-1","title":"As cinco chaves","topics":6,"href":"curso/trilha3/modulo-3-1.html"},{"id":"3-2","title":"Três regras e casos reais","topics":6,"href":"curso/trilha3/modulo-3-2.html"}]},{"n":"4","title":"O que quase ninguém conta","modules":[{"id":"4-1","title":"Ordens escondidas","topics":6,"href":"curso/trilha4/modulo-4-1.html"},{"id":"4-2","title":"Senhas e extensões","topics":6,"href":"curso/trilha4/modulo-4-2.html"},{"id":"4-3","title":"Gasto, isolamento e LGPD","topics":6,"href":"curso/trilha4/modulo-4-3.html"}]},{"n":"5","title":"Assumir o resultado","modules":[{"id":"5-1","title":"Métrica com dono","topics":6,"href":"curso/trilha5/modulo-5-1.html"},{"id":"5-2","title":"A planilha em 4 blocos","topics":6,"href":"curso/trilha5/modulo-5-2.html"}]}]}
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .dark body { background-color: #111827; }
+
+    /* Light mode - base */
+    html:not(.dark) body { background-color: #f8fafc; }
+    html:not(.dark) .bg-dark-900 { background-color: #ffffff; }
+    html:not(.dark) .bg-dark-800 { background-color: #f9fafb; }
+    html:not(.dark) .bg-dark-700 { background-color: #f3f4f6; }
+    html:not(.dark) .bg-dark-600 { background-color: #e5e7eb; }
+    html:not(.dark) .text-neutral-100 { color: #111827; }
+    html:not(.dark) .text-neutral-200 { color: #1f2937; }
+    html:not(.dark) .text-neutral-300 { color: #4b5563; }
+    html:not(.dark) .text-neutral-400 { color: #6b7280; }
+    html:not(.dark) .text-neutral-500 { color: #6b7280; }
+    html:not(.dark) .text-white { color: #111827; }
+    html:not(.dark) .border-dark-600 { border-color: #d1d5db; }
+    html:not(.dark) .border-dark-700 { border-color: #e5e7eb; }
+
+    /* Light mode - acentos das 5 trilhas (emerald, blue, purple, amber, teal) */
+    html:not(.dark) .text-emerald-400 { color: #059669; }
+    html:not(.dark) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12); }
+    html:not(.dark) .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .bg-emerald-900\/20 { background-color: rgba(5, 150, 105, 0.07); }
+    html:not(.dark) .border-emerald-500\/30 { border-color: rgba(5, 150, 105, 0.25); }
+    html:not(.dark) .hover\:bg-emerald-500\/30:hover { background-color: rgba(5, 150, 105, 0.18); }
+    html:not(.dark) .hover\:text-emerald-400:hover { color: #059669; }
+    html:not(.dark) .hover\:bg-emerald-500\/10:hover { background-color: rgba(5, 150, 105, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-emerald-400 { color: #059669; }
+    html:not(.dark) .text-blue-400 { color: #2563eb; }
+    html:not(.dark) .bg-blue-500\/20 { background-color: rgba(37, 99, 235, 0.12); }
+    html:not(.dark) .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .bg-blue-900\/20 { background-color: rgba(37, 99, 235, 0.07); }
+    html:not(.dark) .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.25); }
+    html:not(.dark) .hover\:bg-blue-500\/30:hover { background-color: rgba(37, 99, 235, 0.18); }
+    html:not(.dark) .hover\:text-blue-400:hover { color: #2563eb; }
+    html:not(.dark) .hover\:bg-blue-500\/10:hover { background-color: rgba(37, 99, 235, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-blue-400 { color: #2563eb; }
+    html:not(.dark) .text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .bg-purple-500\/20 { background-color: rgba(124, 58, 237, 0.12); }
+    html:not(.dark) .bg-purple-500\/10 { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .bg-purple-900\/20 { background-color: rgba(124, 58, 237, 0.07); }
+    html:not(.dark) .border-purple-500\/30 { border-color: rgba(124, 58, 237, 0.25); }
+    html:not(.dark) .hover\:bg-purple-500\/30:hover { background-color: rgba(124, 58, 237, 0.18); }
+    html:not(.dark) .hover\:text-purple-400:hover { color: #7c3aed; }
+    html:not(.dark) .hover\:bg-purple-500\/10:hover { background-color: rgba(124, 58, 237, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-purple-400 { color: #7c3aed; }
+    html:not(.dark) .text-amber-400 { color: #92400e; }
+    html:not(.dark) .bg-amber-500\/20 { background-color: rgba(217, 119, 6, 0.12); }
+    html:not(.dark) .bg-amber-500\/10 { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .bg-amber-900\/20 { background-color: rgba(217, 119, 6, 0.07); }
+    html:not(.dark) .border-amber-500\/30 { border-color: rgba(217, 119, 6, 0.25); }
+    html:not(.dark) .hover\:bg-amber-500\/30:hover { background-color: rgba(217, 119, 6, 0.18); }
+    html:not(.dark) .hover\:text-amber-400:hover { color: #92400e; }
+    html:not(.dark) .hover\:bg-amber-500\/10:hover { background-color: rgba(217, 119, 6, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-amber-400 { color: #92400e; }
+    html:not(.dark) .text-teal-400 { color: #0d9488; }
+    html:not(.dark) .bg-teal-500\/20 { background-color: rgba(13, 148, 136, 0.12); }
+    html:not(.dark) .bg-teal-500\/10 { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .bg-teal-900\/20 { background-color: rgba(13, 148, 136, 0.07); }
+    html:not(.dark) .border-teal-500\/30 { border-color: rgba(13, 148, 136, 0.25); }
+    html:not(.dark) .hover\:bg-teal-500\/30:hover { background-color: rgba(13, 148, 136, 0.18); }
+    html:not(.dark) .hover\:text-teal-400:hover { color: #0d9488; }
+    html:not(.dark) .hover\:bg-teal-500\/10:hover { background-color: rgba(13, 148, 136, 0.08); }
+    html:not(.dark) .group:hover .group-hover\:text-teal-400 { color: #0d9488; }
+
+    /* Light mode - remove gradientes e cores especiais */
+    html:not(.dark) [class*="bg-gradient-to"] { background-image: none !important; }
+    html:not(.dark) .text-primary { color: #a16207; }
+    html:not(.dark) .bg-primary\/10 { background-color: rgba(161, 98, 7, 0.08); }
+    html:not(.dark) .border-primary\/40 { border-color: rgba(161, 98, 7, 0.25); }
+    html:not(.dark) .border-primary\/30 { border-color: rgba(161, 98, 7, 0.22); }
+    html:not(.dark) .text-sky-400 { color: #0369a1; }
+    html:not(.dark) .text-yellow-400 { color: #a16207; }
+    html:not(.dark) .text-red-400 { color: #b91c1c; }
+    html:not(.dark) .bg-red-900\/20 { background-color: rgba(185, 28, 28, 0.06); }
+    html:not(.dark) .border-red-500\/30 { border-color: rgba(185, 28, 28, 0.25); }
+    html:not(.dark) .hover\:text-sky-300:hover { color: #0284c7; }
+    html:not(.dark) .hover\:text-yellow-300:hover { color: #854d0e; }
+
+    /* Light mode - nav */
+    html:not(.dark) .bg-dark-900\/95 { background-color: rgba(255, 255, 255, 0.95); }
+
+    /* Dark mode - bordas suaves */
+    .dark .border-dark-600 { border-color: #374151; }
+    .dark .divide-dark-600 > :not([hidden]) ~ :not([hidden]) { border-color: #374151; }
+
+    /* Alvos de ancora abaixo do nav sticky */
+    [data-inema-topic], [id^="modulo-"], [id^="topico-"] { scroll-margin-top: 72px; }
+
+    /* SVG light mode + animacao */
+    html:not(.dark) svg[role="img"] { filter: saturate(0.82) brightness(0.96); }
+    @keyframes wf-pulse { 0%,100% { opacity:.55 } 50% { opacity:1 } }
+    @keyframes wf-dash { to { stroke-dashoffset: -24; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .wf-a { animation: wf-pulse 2.6s ease-in-out infinite; }
+      .wf-a:nth-child(2){animation-delay:.25s} .wf-a:nth-child(3){animation-delay:.5s}
+      .wf-a:nth-child(4){animation-delay:.75s} .wf-a:nth-child(5){animation-delay:1s}
+      .wf-flow { stroke-dasharray: 6 6; animation: wf-dash 1.2s linear infinite; }
+    }
+
+    /* Topicos expansiveis */
+    .topic-explanation { display: none; }
+    .topic-explanation.active { display: block; }
+  </style>
+<link href="https://inematds.github.io/curso-agente-sob-controle-v2/curso/trilha2/modulo-2-2.html" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/en/curso/trilha2/modulo-2-2.html" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/curso-agente-sob-controle-v2/es/curso/trilha2/modulo-2-2.html" hreflang="es" rel="alternate"/></head>
+<body class="bg-dark-900 text-neutral-100 min-h-screen"><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../../../curso/trilha2/modulo-2-2.html" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="modulo-2-2.html" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">EN</a><a href="../../../es/curso/trilha2/modulo-2-2.html" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<a class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-black focus:rounded-lg" href="#conteudo">Skip to content</a>
+<nav class="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-600">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-14">
+<div class="flex items-center space-x-3">
+<a class="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300" href="../../index.html">
+<span class="text-2xl">🛡️</span>
+<span class="font-bold text-lg hidden lg:inline">Agent under Control</span>
+</a>
+<span class="text-neutral-600">|</span>
+<a class="text-sky-400 hover:text-sky-300 text-sm font-medium" href="https://inema.club" target="_blank">INEMA.CLUB</a>
+<span class="text-neutral-600">-</span>
+<a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200 text-sm font-medium" href="https://inema.pro" target="_blank">PRO</a>
+</div>
+<div class="flex items-center space-x-1">
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors" href="../trilha1/index.html">
+<span class="xl:hidden">T1</span><span class="hidden xl:inline">Why now</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-blue-400 bg-blue-500/10" href="index.html">
+<span class="xl:hidden">T2</span><span class="hidden xl:inline">Find the pain point</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" href="../trilha3/index.html">
+<span class="xl:hidden">T3</span><span class="hidden xl:inline">Control</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors" href="../trilha4/index.html">
+<span class="xl:hidden">T4</span><span class="hidden xl:inline">Hidden risks</span>
+</a>
+<a class="px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-400 hover:text-teal-400 hover:bg-teal-500/10 transition-colors" href="../trilha5/index.html">
+<span class="xl:hidden">T5</span><span class="hidden xl:inline">Result</span>
+</a>
+<button class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-journey-open="" title="My journey" type="button">
+<span aria-hidden="true">◷</span><span class="hidden md:inline">Journey</span>
+<span class="inema-journey-badge" data-count="0" data-inema-journey-badge=""></span>
+</button>
+<div class="relative">
+<button aria-controls="aparencia" aria-expanded="false" class="p-2 rounded-lg text-neutral-300 hover:text-neutral-100 transition-colors" data-inema-appearance-toggle="#aparencia" title="Appearance" type="button">
+<span aria-hidden="true" class="text-sm font-semibold">Aa</span><span class="sr-only">Appearance</span>
+</button>
+<div class="inema-appearance-pop" data-inema-appearance="" id="aparencia">
+<div aria-label="Topic" class="inema-segment">
+<button data-inema-set-theme="inema-dark" type="button">Dark</button>
+<button data-inema-set-theme="claro" type="button">Clear</button>
+<button data-inema-set-theme="sepia" type="button">Sepia</button>
+<button data-inema-set-theme="foco" type="button">Focus</button>
+<button data-inema-set-theme="contraste" type="button">High contrast</button>
+</div>
+<div aria-label="Source" class="inema-segment">
+<button data-inema-set-font="inter" type="button">Inter</button>
+<button data-inema-set-font="system" type="button">System</button>
+<button data-inema-set-font="leitura" type="button">Reading</button>
+</div>
+<div aria-label="Text length" class="inema-segment">
+<button data-inema-set-fontscale="100" type="button">A</button>
+<button data-inema-set-fontscale="112" type="button">A+</button>
+<button data-inema-set-fontscale="125" type="button">A++</button>
+</div>
+<div aria-label="Line width" class="inema-segment">
+<button data-inema-set-linewidth="60" type="button">Narrow</button>
+<button data-inema-set-linewidth="68" type="button">Medium</button>
+<button data-inema-set-linewidth="75" type="button">Wide</button>
+</div>
+<div aria-label="Subtext" class="inema-segment">
+<button data-inema-set-leading="1.45" type="button">Compact</button>
+<button data-inema-set-leading="1.7" type="button">Comfortable</button>
+</div>
+</div>
+</div>
+<button aria-label="Toggle light/dark theme" class="p-2 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors" id="theme-toggle">
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-dark-icon" viewbox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+<svg class="hidden w-5 h-5 text-neutral-300" fill="currentColor" id="theme-toggle-light-icon" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<nav aria-label="Navigation track" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="flex items-center space-x-2 text-sm text-neutral-400">
+<a class="hover:text-blue-400" href="../../index.html">Start</a><span>/</span>
+<a class="hover:text-blue-400" href="index.html">Track 2</a><span>/</span>
+<span class="text-blue-400">Module 2.2</span>
+</div>
+</nav>
+<header class="bg-gradient-to-br from-blue-900/30 via-dark-800 to-dark-800 py-12 border-b border-dark-600" data-inema-module="2-2" data-inema-track="2">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full mb-4">MODULE 2.2</span>
+<h1 class="text-3xl sm:text-4xl font-bold mb-4">🏥 A request isn't a problem</h1>
+<p class="text-lg text-neutral-400 max-w-3xl">People who ask for an agent usually come with the solution already figured out. Learn to find the pain point behind the request, put a price on it, and design the first small project.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 max-w-2xl">
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">6</div><div class="text-xs text-neutral-400">Topics</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">~30</div><div class="text-xs text-neutral-400">Minutes</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Practical</div><div class="text-xs text-neutral-400">Level</div></div>
+<div class="bg-dark-800/50 rounded-lg p-3 border border-dark-600"><div class="text-xl font-bold text-blue-400">Case study</div><div class="text-xs text-neutral-400">Type</div></div>
+</div>
+<div aria-label="Module 2.2 progress" aria-valuemax="100" aria-valuemin="0" class="mt-6 max-w-2xl" data-inema-meter="modulo:2-2" role="progressbar">
+<div class="flex justify-between text-xs text-neutral-400 mb-1"><span data-inema-meter-frac="">0 of 6</span><span data-inema-meter-pct="">0%</span></div>
+<div class="inema-bar"><div class="inema-bar__fill" data-inema-meter-fill=""></div></div>
+</div>
+</div>
+</header>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:grid lg:grid-cols-[1fr_220px] lg:gap-10">
+<main class="min-w-0" data-inema-module="2-2" data-inema-track="2" id="conteudo">
+<!-- ===================== TOPICO 1 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-1" id="topico-1">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">1</span>
+<h2 class="text-2xl font-bold flex-1">Separate what’s requested from what’s wanted</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m2-2-t1-p1">Almost no one comes in stating the problem. They come in stating the solution: "I want more customers," "I want to respond faster," "I want to post every day." That's the <strong>request</strong>.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t1-p2">Behind the request is a <strong class="text-blue-400">desire</strong>, almost always to earn more or lose less. “More customers” means “more revenue.” And sometimes the cheapest way to earn more isn’t to bring in new people—it’s to stop losing the ones who are already here.</p>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6 mb-6">
+<h3 class="text-base font-semibold text-blue-400 mb-2 flex items-center"><span class="mr-2">🆕</span> New here? What is a “pain point”?</h3>
+<p class="text-neutral-300 text-sm"><strong>Pain</strong>, in this course, is the point in the business where you're currently losing customers, time, or money — and you can measure how much. "I want to grow" isn't a pain point. "I lose nine appointments a month" is.</p>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="Iceberg. Above the waterline, small, is the tip: the request, 'I want more customers.' Below the water, much larger and highlighted, is the base: the desire, 'more revenue,' and beneath it the pain you can count, 'I lose 9 appointments a month.' An arrow goes from the request down to the pain with the question 'what for?'." class="w-full h-auto" role="img" viewbox="0 0 800 290">
+<defs>
+<pattern height="32" id="m22-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#60a5fa" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="160%" id="m22-glow" width="160%" x="-30%" y="-30%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m22-arrow-c" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m22-grid)" height="290" width="800" x="0" y="0"></rect>
+<line opacity="0.7" stroke="#38bdf8" stroke-dasharray="8 6" stroke-width="1.5" x1="20" x2="780" y1="92" y2="92"></line>
+<text fill="#38bdf8" font-family="Inter,sans-serif" font-size="11" text-anchor="end" x="770" y="84">what you can see</text>
+<text fill="#38bdf8" font-family="Inter,sans-serif" font-size="11" text-anchor="end" x="770" y="110">what you can’t see</text>
+<path d="M340,92 L380,40 L420,48 L460,92 Z" fill="#1f2937" stroke="#4b5563" stroke-width="2"></path>
+<text fill="#d1d5db" font-family="Inter,sans-serif" font-size="13" font-weight="600" text-anchor="middle" x="400" y="30">REQUEST: "I want more customers"</text>
+<g filter="url(#m22-glow)"><path d="M300,96 L500,96 L580,200 L520,270 L280,270 L220,200 Z" fill="#0f1b33" stroke="#60a5fa" stroke-width="2.5"></path></g>
+<text fill="#60a5fa" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="400" y="140">DESIRE: more revenue</text>
+<line opacity="0.5" stroke="#60a5fa" stroke-width="1" x1="300" x2="500" y1="170" y2="170"></line>
+<text fill="#bfdbfe" font-family="Inter,sans-serif" font-size="14" font-weight="600" text-anchor="middle" x="400" y="204">PAIN: I lose 9 appointments a month</text>
+<text fill="#bfdbfe" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="400" y="228">(patients who schedule appointments and don't show up)</text>
+<path class="wf-flow" d="M150,60 C 130,120 140,180 214,200" fill="none" marker-end="url(#m22-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<text fill="#bae6fd" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="120" y="50">ask "what for?"</text>
+<text fill="#bae6fd" font-family="Inter,sans-serif" font-size="12" text-anchor="middle" x="120" y="66">until you find a number</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> the request is the small tip that shows above the surface. The large, illuminated part is underwater: the desire and, deeper down, the pain you can measure. The blue arrow shows the path—keep asking “what for?” until you reach a number.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🗣️</div><div class="text-sm font-semibold text-blue-400">Request</div><p class="text-xs text-neutral-400 mt-1">the solution that arrives ready</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💭</div><div class="text-sm font-semibold text-blue-400">Desire</div><p class="text-xs text-neutral-400 mt-1">earn more, lose less</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🩹</div><div class="text-sm font-semibold text-blue-400">Pain</div><p class="text-xs text-neutral-400 mt-1">measurable loss</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">❓</div><div class="text-sm font-semibold text-blue-400">“For what?”</div><p class="text-xs text-neutral-400 mt-1">the question that goes down</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 2 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-2" id="topico-2">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">2</span>
+<h2 class="text-2xl font-bold flex-1">Study the clinic case</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m2-2-t2-p1">Renata, 44, runs an aesthetics clinic. She wanted an agent to attract more patients through Instagram. Before setting anything up, she opened last month’s schedule.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t2-p2">Noticed something else: patients would book and <strong class="text-blue-400">didn’t appear</strong>. Every no-show meant a paid time slot—room, supplies, professional waiting—with no revenue at all.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">🗣️ What she asked for</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“An agent that brings in more patients.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>More people joining a schedule that was already losing appointments.</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>Ad spend to fill an appointment schedule full of holes.</span></li>
+</ul>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-4">💰 What cost money</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>Patients who booked and didn’t show up.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>No one confirmed the appointment the day before.</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>An empty time slot that didn’t turn into another appointment.</span></li>
+</ul>
+</div>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="A leaky bucket. New patients come in from the top, brought in by Instagram. The bucket is the month’s schedule, with 38 appointments. A hole in the side lets 9 patients who missed their appointments slip out. Beside it, the caption: adding more water to the bucket doesn’t plug the hole; the first agent plugs the hole." class="w-full h-auto" role="img" viewbox="0 0 800 270">
+<defs>
+<pattern height="32" id="m22b-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#60a5fa" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="160%" id="m22b-glow" width="160%" x="-30%" y="-30%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m22b-arrow-c" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+<marker id="m22b-arrow-r" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#f87171"></path></marker>
+</defs>
+<rect fill="url(#m22b-grid)" height="270" width="800" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" text-anchor="middle">
+<text fill="#bae6fd" font-size="12" x="230" y="26">new patients (Instagram)</text>
+<line class="wf-flow" marker-end="url(#m22b-arrow-c)" stroke="#38bdf8" stroke-width="2" x1="200" x2="200" y1="36" y2="84"></line>
+<line class="wf-flow" marker-end="url(#m22b-arrow-c)" stroke="#38bdf8" stroke-width="2" x1="230" x2="230" y1="36" y2="84"></line>
+<line class="wf-flow" marker-end="url(#m22b-arrow-c)" stroke="#38bdf8" stroke-width="2" x1="260" x2="260" y1="36" y2="84"></line>
+<g filter="url(#m22b-glow)"><path d="M130,90 L330,90 L305,240 L155,240 Z" fill="#0f1b33" stroke="#60a5fa" stroke-width="2.5"></path></g>
+<text fill="#60a5fa" font-size="15" font-weight="700" x="230" y="150">AGENDA</text>
+<text fill="#bfdbfe" font-size="13" x="230" y="172">38 appointments/month</text>
+<circle cx="318" cy="170" fill="#3b0d0d" r="8" stroke="#f87171" stroke-width="2"></circle>
+<path class="wf-flow" d="M326,172 C 360,180 380,200 400,215" fill="none" marker-end="url(#m22b-arrow-r)" stroke="#f87171" stroke-width="2"></path>
+<text fill="#fca5a5" font-size="13" font-weight="600" x="460" y="222">9 missed appointments</text>
+<text fill="#fca5a5" font-size="11" x="460" y="240">slip through the hole</text>
+</g>
+<g font-family="Inter,sans-serif" font-size="13">
+<rect fill="#2a0f0f" height="60" rx="12" stroke="#f87171" stroke-width="2" width="240" x="540" y="60"></rect>
+<text fill="#fca5a5" text-anchor="middle" x="660" y="86">more water in the bucket</text>
+<text fill="#fca5a5" font-size="11" text-anchor="middle" x="660" y="104">= more missed appointments, same gap</text>
+<rect fill="#0b1f2e" height="60" rx="12" stroke="#38bdf8" stroke-width="2" width="240" x="540" y="140"></rect>
+<text fill="#bae6fd" text-anchor="middle" x="660" y="166">patch the hole first</text>
+<text fill="#bae6fd" font-size="11" text-anchor="middle" x="660" y="184">= reminder + confirmation</text>
+</g>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> the blue arrows at the top show what the request wanted to increase. The red arrow shows what was already leaking. As long as the hole remains, the more that comes in, the more leaks out—that's why the first agent targets the hole, not the faucet.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📖</div><div class="text-sm font-semibold text-blue-400">Look at the calendar</div><p class="text-xs text-neutral-400 mt-1">before turning anything on</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🪣</div><div class="text-sm font-semibold text-blue-400">Leaky bucket</div><p class="text-xs text-neutral-400 mt-1">input doesn't plug a hole</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🚪</div><div class="text-sm font-semibold text-blue-400">Shortfall</div><p class="text-xs text-neutral-400 mt-1">paid hours, no revenue</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔧</div><div class="text-sm font-semibold text-blue-400">Patch the hole first</div><p class="text-xs text-neutral-400 mt-1">the tap later</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 3 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-3" id="topico-3">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">3</span>
+<h2 class="text-2xl font-bold flex-1">Calculate how much the pain costs</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m2-2-t3-p1">Without a price, the pain is just an opinion. With a price, it becomes a decision. Here’s a back-of-the-envelope calculation: <strong class="text-blue-400">absences × average amount × weeks</strong>.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t3-p2">Renata counted last month’s missed appointments in her paper planner. There were nine, out of thirty-eight scheduled appointments. Each appointment is worth an average of R$ 120.</p>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-blue-400"><tr><th class="px-4 py-3 font-semibold">Step</th><th class="px-4 py-3 font-semibold">Renata's clinic</th><th class="px-4 py-3 font-semibold">What this shows</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">1 · How often it happens</td><td class="px-4 py-3 text-neutral-300">38 appointments booked this month</td><td class="px-4 py-3 text-neutral-300">the process size</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">2 · How many go wrong</td><td class="px-4 py-3 text-neutral-300">9 missed appointments (≈ 2 per week)</td><td class="px-4 py-3 text-neutral-300">almost 1 in 4</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">3 · How much can be recovered today</td><td class="px-4 py-3 text-neutral-300">0 — the time slot stays empty</td><td class="px-4 py-3 text-neutral-300">zero means everything is lost</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">4 · Monthly cost</td><td class="px-4 py-3 text-neutral-300">9 × R$ 120 = <strong class="text-blue-400">R$ 1.080</strong></td><td class="px-4 py-3 text-neutral-300">proof that it’s worth making a change</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">5 · Annual cost</td><td class="px-4 py-3 text-neutral-300">R$ 1.080 × 12 = <strong class="text-blue-400">R$ 12.960</strong></td><td class="px-4 py-3 text-neutral-300">the number that changes the conversation</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">What to look for in the table:</strong> Line 3 is the most important. If you already recover part of the loss today (by fitting in another patient, for example), subtract that. What remains is what the agent can help save.</p>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Practical tip</h3>
+<p class="text-neutral-300 text-sm">You don’t need to get the exact cent right. If you don’t know the average amount, use the most common service. If you don’t know how many were missed this month, count the ones from last week and multiply by 4—and write “estimate” beside it. You’ll measure the exact number in Track 5.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔢</div><div class="text-sm font-semibold text-blue-400">How many times</div><p class="text-xs text-neutral-400 mt-1">process size</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">❌</div><div class="text-sm font-semibold text-blue-400">How many fail</div><p class="text-xs text-neutral-400 mt-1">the loss itself</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">♻️</div><div class="text-sm font-semibold text-blue-400">Recovered</div><p class="text-xs text-neutral-400 mt-1">subtract what you already get back</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💵</div><div class="text-sm font-semibold text-blue-400">Cost of the pain point</div><p class="text-xs text-neutral-400 mt-1">per month and per year</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 4 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-4" id="topico-4">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">4</span>
+<h2 class="text-2xl font-bold flex-1">Design the first small project</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m2-2-t4-p1">With the pain point and price in hand, the clinic's first agent became clear: <strong class="text-blue-400">appointment reminder and confirmation</strong>, with an option to reschedule. No Instagram, no billing.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t4-p2">Small on purpose. It reads the calendar, sends a message, and records the response. Anything that actually changes the calendar—rescheduling, canceling—goes through Renata.</p>
+<div class="space-y-5 mb-6">
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">1</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">2 days before · reminder</h4><p class="text-neutral-300 text-sm">“Hello! Your appointment at the clinic is Thursday at 3 p.m. Reply 1 to confirm or 2 to reschedule.”</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">2</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">The patient responds</h4><p class="text-neutral-300 text-sm">Answer 1: the agent marks “confirmed” in the spreadsheet. Answer 2: it notifies Renata, who reschedules.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">3</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">1 day before · no response</h4><p class="text-neutral-300 text-sm">The agent sends a second reminder, just once. If no one responds after that, it puts the person’s name on a list for reception to call.</p></div>
+</div>
+<div class="flex items-start space-x-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span class="text-blue-400 font-bold">4</span></div>
+<div class="flex-1 bg-dark-800 rounded-xl p-5 border border-dark-600"><h4 class="font-semibold text-neutral-100 mb-1">Available time slot · opening</h4><p class="text-neutral-300 text-sm">Whoever rescheduled frees up a time slot. Renata decides who from the waitlist can take it—the agent only shows who is on it.</p></div>
+</div>
+</div>
+<div class="rounded-2xl border border-blue-500/30 bg-dark-900/40 p-3 sm:p-4 mb-3 overflow-hidden">
+<svg aria-label="First project workflow. The agent reads the schedule and sends a reminder. The response splits into three paths: confirmed, and the agent records it in the spreadsheet; wants to reschedule, and Renata approves; no response, and reception calls. The agent handles only the first path on its own." class="w-full h-auto" role="img" viewbox="0 0 800 250">
+<defs>
+<pattern height="32" id="m22f-grid" patternunits="userSpaceOnUse" width="32"><circle cx="1.3" cy="1.3" fill="#60a5fa" opacity="0.10" r="1.3"></circle></pattern>
+<filter height="180%" id="m22f-glow" width="180%" x="-40%" y="-40%"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+<marker id="m22f-arrow" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"></path></marker>
+<marker id="m22f-arrow-c" markerheight="7" markerwidth="7" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"></path></marker>
+</defs>
+<rect fill="url(#m22f-grid)" height="250" width="800" x="0" y="0"></rect>
+<g font-family="Inter,sans-serif" text-anchor="middle">
+<rect fill="#1f2937" height="50" rx="12" stroke="#4b5563" stroke-width="2" width="120" x="20" y="100"></rect>
+<text fill="#d1d5db" font-size="13" x="80" y="130">📅 read the calendar</text>
+<line marker-end="url(#m22f-arrow)" stroke="#9ca3af" stroke-width="2" x1="142" x2="186" y1="125" y2="125"></line>
+<g filter="url(#m22f-glow)"><rect fill="#0f1b33" height="62" rx="14" stroke="#60a5fa" stroke-width="2.5" width="150" x="190" y="94"></rect></g>
+<text fill="#60a5fa" font-size="13" font-weight="600" x="265" y="122">💬 reminder</text>
+<text fill="#bfdbfe" font-size="11" x="265" y="140">"1 confirms · 2 reschedules"</text>
+<path class="wf-flow" d="M342,112 C 390,80 420,52 470,50" fill="none" marker-end="url(#m22f-arrow-c)" stroke="#38bdf8" stroke-width="2"></path>
+<line marker-end="url(#m22f-arrow)" stroke="#9ca3af" stroke-width="2" x1="342" x2="466" y1="125" y2="125"></line>
+<path d="M342,138 C 390,170 420,198 470,200" fill="none" marker-end="url(#m22f-arrow)" stroke="#9ca3af" stroke-width="2"></path>
+<rect fill="#0b1f2e" height="44" rx="10" stroke="#38bdf8" stroke-width="2" width="306" x="474" y="28"></rect>
+<text fill="#bae6fd" font-size="13" x="627" y="55">✓ confirmed → agent logs it in the spreadsheet</text>
+<rect fill="#1f2937" height="44" rx="10" stroke="#60a5fa" stroke-width="2" width="306" x="474" y="103"></rect>
+<text fill="#bfdbfe" font-size="13" x="627" y="130">↺ reschedule → Renata approves</text>
+<rect fill="#1f2937" height="44" rx="10" stroke="#4b5563" stroke-width="2" width="306" x="474" y="178"></rect>
+<text fill="#d1d5db" font-size="13" x="627" y="205">… no response → reception calls</text>
+</g>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="265" y="190">the agent only decides on its own</text>
+<text fill="#9ca3af" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" x="265" y="206">on the blue path</text>
+</svg>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">How to read the diagram:</strong> The lit-up box is the only automatic send. Of the three outcomes, only the top one (animated blue arrow) ends without anyone involved; the other two go back to a person. It’s a small project because the possible mistake is small: at worst, one extra reminder.</p>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🐣</div><div class="text-sm font-semibold text-blue-400">Small</div><p class="text-xs text-neutral-400 mt-1">on purpose</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📨</div><div class="text-sm font-semibold text-blue-400">Reminder</div><p class="text-xs text-neutral-400 mt-1">2 days and 1 day before</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🙋‍♀️</div><div class="text-sm font-semibold text-blue-400">Renata approves</div><p class="text-xs text-neutral-400 mt-1">reschedule and fit in</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🪶</div><div class="text-sm font-semibold text-blue-400">Cheap mistake</div><p class="text-xs text-neutral-400 mt-1">one more reminder</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 5 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-5" id="topico-5">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">5</span>
+<h2 class="text-2xl font-bold flex-1">Apply this to other professions</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m2-2-t5-p1">The clinic is just an example. The pattern repeats in almost every small business: the request points to <strong>outside</strong> (more customers, more posts), and the pain point is <strong class="text-blue-400">inside</strong> (something that already comes in and gets lost).</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t5-p2">Marcos, a 52-year-old accountant, asked for “an agent to answer clients faster.” The real pain point was documents arriving late on WhatsApp and turning into tax forms with late fees. His assistant, Júlia, spent her mornings chasing paperwork.</p>
+<div class="overflow-x-auto mb-6 rounded-xl border border-dark-600">
+<table class="w-full text-sm text-left">
+<thead class="bg-dark-700/60 text-blue-400"><tr><th class="px-4 py-3 font-semibold">Business</th><th class="px-4 py-3 font-semibold">The request</th><th class="px-4 py-3 font-semibold">The pain point</th><th class="px-4 py-3 font-semibold">First small project</th></tr></thead>
+<tbody class="divide-y divide-dark-600">
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">💇 Salon</td><td class="px-4 py-3 text-neutral-300">"more followers"</td><td class="px-4 py-3 text-neutral-300">last-minute cancellation leaves a seat empty</td><td class="px-4 py-3 text-neutral-300">confirmation the day before + waitlist</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🛍️ Store</td><td class="px-4 py-3 text-neutral-300">"sell through WhatsApp"</td><td class="px-4 py-3 text-neutral-300">budget requested and not answered within 24h</td><td class="px-4 py-3 text-neutral-300">draft response for the owner to approve</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">📑 Accounting</td><td class="px-4 py-3 text-neutral-300">"reply faster"</td><td class="px-4 py-3 text-neutral-300">a late document turns into a fine</td><td class="px-4 py-3 text-neutral-300">list of what each customer still needs, every Monday</td></tr>
+<tr class="bg-dark-800"><td class="px-4 py-3 font-medium text-neutral-100">🏥 Clinic</td><td class="px-4 py-3 text-neutral-300">"more patients"</td><td class="px-4 py-3 text-neutral-300">patient books and doesn't show up</td><td class="px-4 py-3 text-neutral-300">reminder + confirmation</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-sm text-neutral-400 mb-6"><strong class="text-neutral-300">What to look for in the table:</strong> across all the lines, the first project is small, repetitive, and ends with a person approving it. And none of them handle money.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="bg-red-900/20 rounded-xl border border-red-500/30 p-6">
+<h4 class="font-bold text-red-400 mb-4">🗣️ Sounds like a request</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“I want an agent that sells.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“I want to be on every social network.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-red-400">✗</span><span>“I want to automate customer service.”</span></li>
+</ul>
+</div>
+<div class="bg-blue-900/20 rounded-xl border border-blue-500/30 p-6">
+<h4 class="font-bold text-blue-400 mb-4">🩹 Sounds painful</h4>
+<ul class="space-y-3 text-neutral-300 text-sm">
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>“I lose 3 quotes a week because of delays.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>“I pay 2 fines a month for late documents.”</span></li>
+<li class="flex items-start space-x-2"><span class="text-blue-400">✓</span><span>“I have 9 no-shows out of 38 appointments.”</span></li>
+</ul>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">↗️</div><div class="text-sm font-semibold text-blue-400">Request</div><p class="text-xs text-neutral-400 mt-1">points outward</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">↘️</div><div class="text-sm font-semibold text-blue-400">Pain</div><p class="text-xs text-neutral-400 mt-1">is inside the house</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔢</div><div class="text-sm font-semibold text-blue-400">With a number</div><p class="text-xs text-neutral-400 mt-1">otherwise, it's still a request</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🙋</div><div class="text-sm font-semibold text-blue-400">Ends with a person</div><p class="text-xs text-neutral-400 mt-1">in the first project</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== TOPICO 6 ===================== -->
+<section class="mb-16" data-inema-topic="modulo-2-2#topico-6" id="topico-6">
+<div class="flex flex-wrap items-center gap-4 mb-6">
+<span class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xl">6</span>
+<h2 class="text-2xl font-bold flex-1">Write the pain point</h2>
+<button aria-pressed="false" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-600 text-neutral-300 hover:bg-dark-600 transition-colors text-sm" data-inema-doubt-toggle="" type="button"><span aria-hidden="true">?</span><span>I have a question</span></button>
+</div>
+<p class="text-neutral-300 mb-4 leading-relaxed" data-inema-block="m2-2-t6-p1">Everything in this track fits into one sentence. It’s the first field in the agent profile you’ve been building since module 1.2—and the starting point for track 3.</p>
+<p class="text-neutral-300 mb-6 leading-relaxed" data-inema-block="m2-2-t6-p2">If the sentence doesn’t add up, something is missing: the number, the cause, or what the agent will do. Go back to the topic that was left blank.</p>
+<div class="bg-dark-800 rounded-xl border border-blue-500/30 overflow-hidden mb-6">
+<div class="px-5 py-3 bg-blue-900/20 border-b border-blue-500/30"><span class="text-blue-400 font-semibold text-sm">🎯 Goal: leave with a revised statement of your business pain point</span></div>
+<div class="p-5">
+<p class="text-sm text-neutral-400 mb-3">Paste into the AI chat you already use (ChatGPT, Claude, Gemini). Replace what's inside &lt; &gt; with what you found in modules 2.1 and 2.2.</p>
+<pre class="font-mono text-sm text-neutral-200 whitespace-pre-wrap bg-dark-900/60 rounded-lg p-4 border border-dark-600">Quero escrever a "frase da dor" do meu negócio, neste molde:
+
+"Hoje perdemos &lt;quanto: reais, horas ou clientes por semana/mês&gt;
+por &lt;o que acontece: ex.: pacientes que marcam e faltam&gt;
+porque &lt;a causa: ex.: ninguém confirma o horário na véspera&gt;;
+o primeiro agente vai &lt;uma ação pequena: ex.: mandar lembrete e pedir confirmação&gt;."
+
+Meu negócio: &lt;uma linha&gt;.
+Meus números: &lt;o que contei ou estimei&gt;.
+
+Revise a minha frase com estas regras:
+1. O "quanto" precisa ser um número. Se eu não dei, pergunte.
+2. O "por" precisa ser um fato, não um desejo ("vender mais" não vale).
+3. O "porque" precisa ser algo que um agente consegue mudar.
+4. O "vai" precisa ser UMA ação pequena, sem mexer em dinheiro e com uma pessoa aprovando o que for mudar agenda, cliente ou envio em massa.
+Devolva a frase corrigida e, em uma linha, o que você mudou e por quê.
+Não invente números.</pre>
+</div>
+<div class="px-5 py-3 bg-dark-700/40 border-t border-dark-600 text-neutral-300 text-sm"><strong class="text-blue-400">How to verify:</strong> read the sentence to someone who doesn’t know your business. They should understand, without an explanation, what is lost, how much, why, and what the agent will do. If they ask, "but how much?", the number is missing.</div>
+</div>
+<div class="bg-primary/10 rounded-xl border border-primary/30 p-6 mb-6">
+<h3 class="text-lg font-semibold text-primary mb-2 flex items-center"><span class="mr-2">💡</span> Renata’s sentence</h3>
+<p class="text-neutral-300 text-sm">“Today we lose <strong>R$ 1.080 per month</strong> per <strong>patients who book and don't show up</strong> because <strong>no one confirms the appointment time the day before</strong>; the first agent will <strong>send a reminder two days ahead and ask for confirmation — and reschedule only with my approval</strong>."</p>
+</div>
+<div class="bg-dark-800 rounded-xl border border-dark-600 p-6 mb-6" data-inema-check="modulo-2-2#q1">
+<p class="font-medium mb-4">Quick test (optional): which of these is a pain statement that closes?</p>
+<div class="space-y-2">
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="0" type="button">“I want an agent that brings more clients to the office.”</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="1" type="button">“Today we waste a lot of time on WhatsApp because it’s a mess; the agent will handle customer service.”</button>
+<button class="block w-full text-left px-4 py-2 rounded-lg bg-dark-700 border border-dark-600 hover:bg-dark-600 transition-colors text-sm" data-inema-check-option="2" type="button">“Today we pay 2 fines a month for late tax forms because documents arrive late; the first agent will list what’s missing for each client every Monday.”</button>
+</div>
+<div aria-live="polite" class="mt-4 text-sm" data-inema-check-feedback="" role="status"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">💵</div><div class="text-sm font-semibold text-blue-400">How much</div><p class="text-xs text-neutral-400 mt-1">one number</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">📍</div><div class="text-sm font-semibold text-blue-400">For</div><p class="text-xs text-neutral-400 mt-1">one fact</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🔍</div><div class="text-sm font-semibold text-blue-400">Because</div><p class="text-xs text-neutral-400 mt-1">one cause you can change</p></div>
+<div class="bg-dark-800 rounded-xl p-4 border border-dark-600 text-center"><div class="text-2xl mb-1">🤖</div><div class="text-sm font-semibold text-blue-400">Go</div><p class="text-xs text-neutral-400 mt-1">one small action</p></div>
+</div>
+<div class="flex justify-start mt-6">
+<button aria-pressed="false" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors" data-inema-read-toggle="" type="button">
+<span aria-hidden="true" class="inema-read-icon">○</span><span class="inema-read-label">Mark as read</span>
+</button>
+</div>
+</section>
+<!-- ===================== RESUMO ===================== -->
+<section class="mb-12">
+<div class="bg-gradient-to-br from-blue-900/40 via-dark-800 to-dark-800 rounded-xl border border-blue-500/30 p-8">
+<h2 class="text-2xl font-bold mb-6 flex items-center"><span class="mr-3">🎓</span> Module summary</h2>
+<div class="space-y-4 mb-8">
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">A request isn't a problem</strong><span class="text-neutral-400"> — ask “what for?” until you find a number.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">Patch the hole before turning on the tap</strong><span class="text-neutral-400"> — more customers won’t fix a leaky schedule.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">The pain point has a price</strong><span class="text-neutral-400"> — absences × average value × weeks.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">First small project</strong><span class="text-neutral-400"> — makes cheap mistakes and ends with a person approving.</span></div></div>
+<div class="flex items-start space-x-3"><span class="text-blue-400 mt-1">✓</span><div><strong class="text-neutral-100">The pain point sentence</strong><span class="text-neutral-400"> — how much, for, because, goes: the first field in the form.</span></div></div>
+</div>
+<div class="bg-dark-800/50 rounded-lg p-4 mb-8">
+<h3 class="font-semibold text-blue-400 mb-2">Next track:</h3>
+<p class="text-neutral-300">T3 — Control the system: once you’ve chosen the pain point, you still need to decide what the agent can access.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="flex-1 text-center px-6 py-3 bg-dark-700 text-neutral-300 rounded-lg font-semibold hover:bg-dark-600 transition-colors" href="index.html">← Back to the trail</a>
+<a class="flex-1 text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors" href="../trilha3/index.html">Track 3: Control the system →</a>
+</div>
+</div>
+</section>
+</main>
+<aside class="hidden lg:block">
+<nav aria-label="Page index" class="sticky top-24" data-inema-toc="">
+<p class="text-sm text-neutral-400 mb-3"><span data-inema-section-counter="">Section 1 of 6</span></p>
+<ol class="space-y-2 text-sm">
+<li><a class="text-neutral-400 hover:text-blue-400" href="#topico-1">1. Request × desire</a></li>
+<li><a class="text-neutral-400 hover:text-blue-400" href="#topico-2">2. Clinic case</a></li>
+<li><a class="text-neutral-400 hover:text-blue-400" href="#topico-3">3. Cost of pain</a></li>
+<li><a class="text-neutral-400 hover:text-blue-400" href="#topico-4">4. Small project</a></li>
+<li><a class="text-neutral-400 hover:text-blue-400" href="#topico-5">5. Other professions</a></li>
+<li><a class="text-neutral-400 hover:text-blue-400" href="#topico-6">6. The pain point</a></li>
+</ol>
+</nav>
+</aside>
+</div>
+<footer class="border-t border-dark-600 py-8 mt-16">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-neutral-500 text-sm">
+<p>Agent under Control · 2026 | <a class="text-sky-400 hover:text-sky-300" href="https://inema.club" target="_blank">INEMA.CLUB</a> - <a class="text-amber-700 hover:text-amber-600 dark:text-slate-300 dark:hover:text-slate-200" href="https://inema.pro" target="_blank">PRO</a></p>
+</div>
+</footer>
+<script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const _html = document.documentElement;
+    if (!_html.classList.contains('dark')) { themeToggleDarkIcon.classList.remove('hidden'); }
+    else { themeToggleLightIcon.classList.remove('hidden'); }
+    themeToggle.addEventListener('click', () => {
+      if (window.INEMA && INEMA.setPref) { INEMA.setPref('theme', _html.classList.contains('dark') ? 'claro' : 'inema-dark'); }
+      else { _html.classList.toggle('dark'); }
+      themeToggleDarkIcon.classList.toggle('hidden', _html.classList.contains('dark'));
+      themeToggleLightIcon.classList.toggle('hidden', !_html.classList.contains('dark'));
+      try { localStorage.setItem('theme', _html.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
+    });
+    function toggleTopic(button) {
+      const item = button.closest('.topic-item');
+      const exp = item.querySelector('.topic-explanation');
+      const card = button.closest('[id^="modulo-"]') || document;
+      card.querySelectorAll('.topic-explanation.active').forEach(e => { if (e !== exp) { e.classList.remove('active'); const b = e.parentElement.querySelector('[aria-controls]'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+      exp.classList.toggle('active');
+      button.setAttribute('aria-expanded', exp.classList.contains('active') ? 'true' : 'false');
+    }
+    let _lastModalTrigger = null;
+    function openModal(id){ const m=document.getElementById(id); if(m){ _lastModalTrigger=document.activeElement; m.classList.remove('hidden'); document.body.style.overflow='hidden'; const c=m.querySelector('button'); if(c) c.focus(); } }
+    function closeModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); document.body.style.overflow='auto'; if(_lastModalTrigger){ _lastModalTrigger.focus(); _lastModalTrigger=null; } }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+<script src="../../../assets/learn.js"></script>
+<script>
+    if (window.INEMA && typeof window.INEMA.init === 'function') { window.INEMA.init(); }
+  </script>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.INEMA && INEMA.registerCheck) {
+        INEMA.registerCheck('modulo-2-2#q1', { answer: 2, explain: {
+          '0': 'Isso é um pedido: aponta para fora e não tem número, fato nem causa. Pergunte "para quê?" até achar a dor.',
+          '1': 'Quase. Falta o número ("muito tempo" quanto?) e a ação é grande demais ("resolver o atendimento"). O primeiro agente faz uma coisa pequena.',
+          '2': 'Isso. Tem quanto (2 multas por mês), por (guias atrasadas), porque (documentos chegam tarde) e vai (uma lista semanal, sem mexer em dinheiro).'
+        } });
+      }
+    });
+  </script>
+</body>
+</html>
